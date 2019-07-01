@@ -1,44 +1,59 @@
-var game;
-var sprite;
-
-
-function preload() {
-    game.load.spritesheet('mummy', './metalslug_mummy37x45.png', 37, 45, 18);
-    game.load.spritesheet('monster', './metalslug_monster39x40.png', 39, 40);
-
-}
-
-
-function create() {
-
-    sprite = game.add.sprite(300, 200, 'monster');
-
-    sprite.animations.add('walk', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
-    sprite.animations.play('walk', 20, true);
-    sprite.scale.set(4);
-    sprite.smoothed = false;
-
-    game.input.onDown.add(changeTexture, this);
-
-}
-
-function changeTexture() {
-
-    if (sprite.key === 'monster')
-    {
-        sprite.loadTexture('mummy', 0, false);
+var config = {
+    type: Phaser.AUTO,
+    parent: 'phaser-example',
+    width: 800,
+    height: 600,
+    pixelArt: true,
+    scene: {
+        preload: preload,
+        create: create
     }
-    else
-    {
-        sprite.loadTexture('monster', 0, false);
-    }
+};
 
-    // sprite.smoothed = false;
+var game = new Phaser.Game(config);
 
+function preload ()
+{
+    this.load.image('poo', 'poo.png');
+    this.load.spritesheet('mummy', 'mummy37x45.png', { frameWidth: 37, frameHeight: 45 });
 }
 
-window.onload = function(){
-    game = new Phaser.Game(600, 400, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create });
+function create ()
+{
+    var mummyAnimation = this.anims.create({
+        key: 'walk',
+        frames: this.anims.generateFrameNumbers('mummy'),
+        frameRate: 16,
+        repeat: 7
+    });
+
+    var sprite = this.add.sprite(50, 300, 'mummy').setScale(4);
+
+    sprite.play('walk');
+
+    this.tweens.add({
+        targets: sprite,
+        x: 750,
+        duration: 8800,
+        ease: 'Linear'
+    });
+
+    sprite.on('animationrepeat-walk', function () {
+
+        var poop = this.add.image(sprite.x - 32, 300, 'poo').setScale(0.5);
+
+        this.tweens.add({
+            targets: poop,
+            props: {
+                x: {
+                    value: '-=64', ease: 'Power1'
+                },
+                y: {
+                    value: '+=50', ease: 'Bounce.easeOut'
+                }
+            },
+            duration: 750
+        });
+
+    }, this);
 }
-
-
