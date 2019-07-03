@@ -1,8 +1,22 @@
 {
   "name": "discodance",
+  "version": "1.0.0",
+  "private": true,
   "description": "HTML5 game",
-  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --config webpack.config.js",
+    "hot": "webpack-dev-server --content-base public --hot --inline"
+  },
+  "keywords": [],
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.5",
+    "webpack-dev-server": "^3.7.2"
   }
 }
