@@ -1,19 +1,36 @@
-import testScene from './scenes/test.js';
+const sceneManager = require('./scene-manager.js');
 
-var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    plugins: {
-        scene: [
-            {
-                key: 'dragonBones',
-                plugin: dragonBones.phaser.plugin.DragonBonesScenePlugin,
-                mapping: 'dragonbone'
-            }
-        ]
-    },
-    scene: [ testScene ]
-};
+const app = new PIXI.Application({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    autoResize: true,
+    resolution: window.devicePixelRatio || 1
+});
 
-var game = new Phaser.Game(config);
+app.width = app.screen.width;
+app.height = app.screen.height;
+app.ratio = app.height/app.width;
+
+window.addEventListener('resize', () => {
+    const width = window.innerWidth,
+          height = window.innerHeight,
+          baseHeight = width*app.ratio;
+    app.renderer.resize(width, height);
+    app.stage.scale.set(width/app.width, baseHeight/app.height);
+    if (height > baseHeight) {
+        app.stage.position.y = (height-baseHeight)/2
+    }
+});
+
+window.onload = function() {
+    app.view.style.display = 'block';
+    document.body.appendChild(app.view);
+}
+
+sceneManager.initiate(app);
+
+sceneManager.play('preload');
+
+app.ticker.add(delta => {
+    sceneManager.update(delta);
+});
