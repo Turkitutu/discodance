@@ -1,4 +1,6 @@
-const sceneManager = require('./scene-manager.js');
+const SceneManager = require('./scene-manager.js'),
+      Camera = require('./camera.js'),
+      Keyboard = require('./keyboard.js');
 
 const app = new PIXI.Application({
     width: window.innerWidth,
@@ -22,12 +24,16 @@ window.addEventListener('resize', () => {
     }
 });
 
-window.onload = function() {
+window.onload = () => {
     app.view.style.display = 'block';
     document.body.appendChild(app.view);
 }
 
-sceneManager.initiate(app);
+const keyboard = new Keyboard();
+
+const camera = new Camera(app.width/2, app.height/2);
+
+const sceneManager = new SceneManager(app, camera, keyboard);
 
 sceneManager.play('preload');
 

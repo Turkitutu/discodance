@@ -1,6 +1,7 @@
 module.exports = class Player {
 
-    constructor(resources, armature, x, y) {
+    constructor(armature, x, y) {
+        const resources = PIXI.loaders.shared.resources;
         const factory = dragonBones.PixiFactory.factory;
         factory.parseDragonBonesData(resources.character.data);
         factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);
@@ -24,14 +25,14 @@ module.exports = class Player {
         if (this.isMoving){
             if (this.isMovingRight){
                 if (this.character.animation.lastAnimationName == "breath"){
-                    this.character.animation.play("run");
+                    this.character.animation.fadeIn("run", 0.05);
                 }
                 let v = {x: 5, y: this.body.velocity.y}
                 Matter.Body.setVelocity(this.body, v);
                 this.character.scale.set(-this.scale, this.scale);
             }else{
                 if (this.character.animation.lastAnimationName == "breath"){
-                    this.character.animation.play("run");
+                    this.character.animation.fadeIn("run", 0.05);
                 }
                 let v = {x: -5, y: this.body.velocity.y}
                 Matter.Body.setVelocity(this.body, v);
@@ -41,12 +42,12 @@ module.exports = class Player {
         }else{
             if (this.isMovingRight){
                 if (this.character.animation.lastAnimationName == "run"){
-                    this.character.animation.play("breath");
+                    this.character.animation.fadeIn("breath", 0.05);
                 }
                 this.character.scale.set(-this.scale, this.scale)
             }else{
                 if (this.character.animation.lastAnimationName == "run"){
-                    this.character.animation.play("breath");
+                    this.character.animation.fadeIn("breath", 0.05);
                 }
                 this.character.scale.set(this.scale, this.scale)
             }

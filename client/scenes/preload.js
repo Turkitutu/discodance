@@ -12,8 +12,8 @@ module.exports = class preload extends PIXI.Container {
         .load((loader, resources) => {
             const bar_outer = new PIXI.Sprite(resources.bar_outer.texture),
                   bar_inner = new PIXI.Sprite(resources.bar_inner.texture),
-                  x = this.scenes.app.width/2 - bar_outer.width/2,
-                  y = this.scenes.app.height/2 - bar_outer.height/2,
+                  x = -bar_outer.width/2,
+                  y = -bar_outer.height/2,
                   rect = new PIXI.Rectangle(0, 0, 0, bar_inner.texture.baseTexture.height);
             bar_outer.position.set(x, y);
             this.addChild(bar_outer);
@@ -24,12 +24,14 @@ module.exports = class preload extends PIXI.Container {
             .add("character", "assets/character_ske.json")
             .add("character_info", "assets/character_tex.json")
             .add("character_tex", "assets/character_tex.png")
+            .add("keydata", "assets/keydata.json")
             .on("progress", loader => {
                 rect.width = loader.progress*bar_inner.texture.baseTexture.width/100;
                 bar_inner.texture.frame = rect;
                 bar_inner.texture = bar_inner.texture;
             })
             .load((loader, resources) => {
+                this.input.batchRegister(PIXI.loaders.shared.resources.keydata.data);
                 this.loaded = true;
             });
         });
