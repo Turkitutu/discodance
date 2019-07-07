@@ -1,17 +1,33 @@
+const Player = require('../player.js')
+
 module.exports = class test extends PIXI.Container {
     constructor() {
         super();
         this.name = 'test';
     }
+
     play() {
+        this.engine = Matter.Engine.create();
+        Matter.Engine.run(this.engine);
+
         const resources = PIXI.loaders.shared.resources;
-        const factory = dragonBones.PixiFactory.factory;
-        factory.parseDragonBonesData(resources.character.data);
-        factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);
-        const armature = factory.buildArmatureDisplay("body", "character");
-        armature.animation.play("breath");
-        armature.position.set(200,300);
-        armature.scale.set(0.3, 0.3);
-        this.addChild(armature);
+        this.player = new Player(resources, 'character', 200, 100);
+
+        var test_ground = Matter.Bodies.rectangle(400, 500, 810, 60, { isStatic: true });
+        Matter.World.add(this.engine.world, [test_ground, this.player.body]);
+
+        this.addChild(this.player.character);
+
+        var a = new PIXI.Graphics();
+        a.lineStyle(2, 0xFF0000);
+        a.drawRect(400-810/2, 500-60/2, 810, 60);
+        this.addChild(a);
     }
+
+    update(){
+        this.player.update();
+    }
+    
 }
+
+
