@@ -1,6 +1,7 @@
 const SceneManager = require('./scene-manager.js'),
       Camera = require('./camera.js'),
-      Keyboard = require('./keyboard.js');
+      Keyboard = require('./keyboard.js'),
+      keysDefault = require('./utils/keys-default.js');
 
 const app = new PIXI.Application({
     width: window.innerWidth,
@@ -30,6 +31,7 @@ window.onload = () => {
 }
 
 const keyboard = new Keyboard();
+keyboard.batchRegister(keysDefault);
 
 const camera = new Camera(app.width/2, app.height/2);
 
