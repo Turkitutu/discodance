@@ -1,6 +1,6 @@
-const World = require('../world.js'),
-      PhysicObject = require('../object.js'),
-      Player = require('../player.js');
+const World = require('../physics/world.js'),
+      PhysicObject = require('../physics/object.js'),
+      Player = require('../physics/player.js');
 
 module.exports = class battle extends PIXI.Container {
     constructor() {

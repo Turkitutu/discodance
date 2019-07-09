@@ -1,4 +1,4 @@
-const Player = require('../player.js')
+const Player = require('../physics/player.js')
 
 module.exports = class test extends PIXI.Container {
     constructor() {
