@@ -24,14 +24,12 @@ module.exports = class preload extends PIXI.Container {
             .add("character", "assets/character_ske.json")
             .add("character_info", "assets/character_tex.json")
             .add("character_tex", "assets/character_tex.png")
-            .add("keydata", "assets/keydata.json")
             .on("progress", loader => {
                 rect.width = loader.progress*bar_inner.texture.baseTexture.width/100;
                 bar_inner.texture.frame = rect;
                 bar_inner.texture = bar_inner.texture;
             })
             .load((loader, resources) => {
-                this.input.batchRegister(PIXI.loaders.shared.resources.keydata.data);
                 this.loaded = true;
             });
         });
