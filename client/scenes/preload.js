@@ -36,7 +36,7 @@ module.exports = class preload extends PIXI.Container {
     }
     update() {
         if (this.loaded) {
-            this.scenes.play('test');
+            this.scenes.play('battle');
             this.disable();
         }
     }
