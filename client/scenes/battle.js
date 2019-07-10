@@ -6,15 +6,16 @@ module.exports = class battle extends PIXI.Container {
     constructor() {
         super();
         this.name = 'battle';
-        this.playerList = []; // or {} idk;
     }
-
     play() {
+        this.playerList = []; // or {} idk;
+        
         this.world = new World({
             gravity: {
                 x: 0,
                 y: 3
-            }
+            },
+            debug: true
         });
         
         //TODO: Get room info, add new player, send new player info (?), display players
@@ -25,16 +26,16 @@ module.exports = class battle extends PIXI.Container {
         this.world.add([test_ground, this.player.body]);
 
         this.addChild(this.player.sprite);
-
+        /*
         var a = new PIXI.Graphics();
         a.lineStyle(2, 0xFF0000);
         a.drawRect(-810/2, 100-60/2, 810, 60);
-        this.addChild(a);
+        this.addChild(a);*/
 
-        this.addChild(this.player.graphics);
+        //this.addChild(this.player.graphics);
+        this.addChild(this.world.renderer);
     }
-
-    update(delta){
+    update(delta) {
         this.player.movement = World.handleMoves(this.input);
 
         for (const player of this.playerList) {
@@ -42,6 +43,5 @@ module.exports = class battle extends PIXI.Container {
         }
 
         this.world.update(delta);
-    }
-    
+    }    
 }

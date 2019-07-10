@@ -59,10 +59,10 @@ module.exports = class Player extends PhysicObject {
         this.move();
 
         super.update();
-
+        /*
         this.graphics.clear();
         this.graphics.lineStyle(2, 0xFF0000);
         this.graphics.drawRect(this.body.position.x-this.size[0]/2, this.body.position.y-this.size[1]/2, this.size[0], this.size[1]);
-    }
+    */}
 
 }

@@ -61,7 +61,7 @@ module.exports = class Camera {
                 dy = Math.max(dy, Math.abs(bc.y-target.position.y)+target.height/2);
             }
             const app = this._target.scenes.app,
-                  zoom = (dx*app.ratio > dy ? app.width/dx : app.height/dy)*this._scale;
+                  zoom = (dx/app.ratio > dy ? app.width/dx : app.height/dy)*this._scale;
             this._target.scale.set(zoom, zoom)
         }
     }

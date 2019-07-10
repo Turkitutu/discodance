@@ -16,7 +16,8 @@ module.exports = class login extends PIXI.Container {
         }
 
         var logo = new PIXI.Sprite(resources.logo_spalsh.texture);
-        logo.position.set(-logo.width/2, -300);
+        logo.scale.set(2, 2);
+        logo.position.set(-logo.width/2, -700);
         this.addChild(logo);
 
         var nickname = new PIXI.TextInput(style);
@@ -44,7 +45,7 @@ module.exports = class login extends PIXI.Container {
 
     update(delta){
         if (this.input.keyDown.enter) {
-            this.scenes.play('test');
+            this.scenes.play('battle');
             this.disable();
         }
     }

@@ -31,6 +31,11 @@ class Keyboard {
     registerKey(keyCode, key) {
         this._regist[keyCode] = key;
         this.keyDown[key.name] = 0;
+        if (key.aliases) {
+            for (const alias of key.aliases) {
+                this._regist[alias] = key;
+            }
+        }
     }
     batchRegister(keys) {
         for (const key of keys) {

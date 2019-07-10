@@ -10,20 +10,29 @@ const app = new PIXI.Application({
     resolution: window.devicePixelRatio || 1
 });
 
-app.width = app.screen.width;
-app.height = app.screen.height;
-app.ratio = app.height/app.width;
-
-window.addEventListener('resize', () => {
-    const width = window.innerWidth,
-          height = window.innerHeight,
-          baseHeight = width*app.ratio;
+const resize = () => {
+    let width = window.innerWidth,
+        height = window.innerHeight,
+        baseHeight = width/app.ratio,
+        position = app.stage.position;
     app.renderer.resize(width, height);
-    app.stage.scale.set(width/app.width, baseHeight/app.height);
-    if (height > baseHeight) {
-        app.stage.position.y = (height-baseHeight)/2
+    if (height >= baseHeight) {
+        position.set(0, (height-baseHeight)/2);
+        height = baseHeight;
+    } else {
+        let baseWidth = height*app.ratio;
+        position.set((width-baseWidth)/2, 0);
+        width = baseWidth;
     }
-});
+    app.stage.scale.set(width/app.width, height/app.height);
+}
+
+app.width = 2560;
+app.height = 1440;
+app.ratio = app.width/app.height;
+
+window.addEventListener('resize', resize);
+resize();
 
 window.onload = () => {
     app.view.style.display = 'block';
