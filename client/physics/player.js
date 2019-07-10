@@ -1,57 +1,68 @@
-module.exports = class Player {
+const PhysicObject = require('./object.js');
 
-    constructor(armature, x, y) {
-        const resources = PIXI.loaders.shared.resources;
-        const factory = dragonBones.PixiFactory.factory;
+module.exports = class Player extends PhysicObject {
+
+    constructor(/*skin/clothes(?)*/) {
+        const resources = PIXI.loaders.shared.resources,
+              factory = dragonBones.PixiFactory.factory;
         factory.parseDragonBonesData(resources.character.data);
         factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);
-        this.isMoving = false;
-        this.isMovingRight = false;
-        this.scale = 0.3;
-        this.character = factory.buildArmatureDisplay('body', armature);
-        this.character.scale.set(this.scale, this.scale)
-        this.character.pivot.set(0, -154)
-        this.character.animation.play("breath");
-        this.body = Matter.Bodies.rectangle(x, y, 30, 100);
-        this.body.frictionStatic = Infinity
-        this.body.friction = Infinity
-        Matter.Body.setInertia(this.body, Infinity)
+        super({
+            shape: 'rectangle',
+            sprite: {
+                object: factory.buildArmatureDisplay('body', 'character'),
+                size: [30, 100],
+                anchor: [0, 0.5],
+                scale: [0.3, 0.3]
+            },
+            properties: [0, 0, 30, 100],
+            frictionStatic: 1,
+            friction: 1,
+            frictionAir: 0.1,
+            fixedRotation: true
+        });
+        this.movement = [];
+        this.speed = 10;
+        this.state = 'breath';
+        //this.body.frictionStatic = Infinity
+        //this.body.friction = Infinity
+        this.graphics = new PIXI.Graphics();
     }
-
-    update(){
-        this.character.x = this.body.position.x;
-        this.character.y = this.body.position.y;
-        this.character.rotation = this.body.angle;
-        if (this.isMoving){
-            if (this.isMovingRight){
-                if (this.character.animation.lastAnimationName == "breath"){
-                    this.character.animation.fadeIn("run", 0.05);
-                }
-                let v = {x: 5, y: this.body.velocity.y}
-                Matter.Body.setVelocity(this.body, v);
-                this.character.scale.set(-this.scale, this.scale);
-            }else{
-                if (this.character.animation.lastAnimationName == "breath"){
-                    this.character.animation.fadeIn("run", 0.05);
-                }
-                let v = {x: -5, y: this.body.velocity.y}
-                Matter.Body.setVelocity(this.body, v);
-                this.character.scale.set(this.scale, this.scale)
-            }
-
-        }else{
-            if (this.isMovingRight){
-                if (this.character.animation.lastAnimationName == "run"){
-                    this.character.animation.fadeIn("breath", 0.05);
-                }
-                this.character.scale.set(-this.scale, this.scale)
-            }else{
-                if (this.character.animation.lastAnimationName == "run"){
-                    this.character.animation.fadeIn("breath", 0.05);
-                }
-                this.character.scale.set(this.scale, this.scale)
-            }
+    get state() {
+        return this._state;
+    }
+    set state(value) {
+        if (this._state !== value && this.can(value)) {
+            this._state = value;
+            this.sprite.animation.fadeIn(value, 0.05);
         }
+    }
+    can(state) {
+        switch (state) {
+            case 'run':
+                return this.state !== 'jump';
+            default:
+                return true;
+        }
+    }
+    move() {
+        if (this.movement[0] || this.movement[1]) {
+            const factor = this.movement[0] ? 1 : -1;
+            this.state = 'run';
+            this.sprite.scale.x = -Math.abs(this.sprite.scale.x)*factor;
+            this.setVelocity(this.speed*factor);
+        } else {
+            this.state = 'breath';
+        }
+    }
+    update() {        
+        this.move();
+
+        super.update();
+
+        this.graphics.clear();
+        this.graphics.lineStyle(2, 0xFF0000);
+        this.graphics.drawRect(this.body.position.x-this.size[0]/2, this.body.position.y-this.size[1]/2, this.size[0], this.size[1]);
     }
 
 }

@@ -41,4 +41,7 @@ sceneManager.play('preload');
 
 app.ticker.add(delta => {
     sceneManager.update(delta);
+
+    //last thing
+    keyboard.update();
 });

@@ -2,10 +2,13 @@ class Keyboard {
     constructor() {
         this._regist = {};
         this.keyDown = {};
+        this.wasModified = {};
         window.addEventListener("keydown", e => {
             e.preventDefault();
             const key = this._regist[e.keyCode || e.charCode];
             if (key) {
+                if (!this.keyDown[key.name])
+                    this.wasModified[key.name] = true;
                 this.keyDown[key.name] = 2;
                 if (key.opposite && this.keyDown[key.opposite]) {
                     this.keyDown[key.opposite] = 1;
@@ -16,6 +19,8 @@ class Keyboard {
             e.preventDefault();
             const key = this._regist[e.keyCode || e.charCode];
             if (key) {
+                if (this.keyDown[key.name])
+                    this.wasModified[key.name] = true;
                 this.keyDown[key.name] = 0;
             }
         })
@@ -28,6 +33,9 @@ class Keyboard {
         for (const key of keys) {
             this.registerKey(key.keyCode, key);
         }
+    }
+    update() {
+        this.wasModified = {};
     }
 }
 

@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-    mode: "production",
+    mode: "development",
     entry: "./client/main.js",
     output: {
         filename: "main.js",
