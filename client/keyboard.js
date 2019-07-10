@@ -3,8 +3,10 @@ class Keyboard {
         this._regist = {};
         this.keyDown = {};
         this.wasModified = {};
+        this.preventDefault = true;
         window.addEventListener("keydown", e => {
-            e.preventDefault();
+            if (this.preventDefault)
+                e.preventDefault();
             const key = this._regist[e.keyCode || e.charCode];
             if (key) {
                 if (!this.keyDown[key.name])
@@ -16,7 +18,8 @@ class Keyboard {
             }
         })
         window.addEventListener("keyup", e => {
-            e.preventDefault();
+            if (this.preventDefault)
+                e.preventDefault();
             const key = this._regist[e.keyCode || e.charCode];
             if (key) {
                 if (this.keyDown[key.name])

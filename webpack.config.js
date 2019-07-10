@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+<<<<<<< HEAD
     mode: "development",
     entry: "./client/main.js",
     output: {

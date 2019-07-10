@@ -24,6 +24,7 @@ module.exports = class preload extends PIXI.Container {
             .add("character", "assets/character_ske.json")
             .add("character_info", "assets/character_tex.json")
             .add("character_tex", "assets/character_tex.png")
+            .add("logo_spalsh", "assets/spalsh.png")
             .on("progress", loader => {
                 rect.width = loader.progress*bar_inner.texture.baseTexture.width/100;
                 bar_inner.texture.frame = rect;
@@ -36,7 +37,7 @@ module.exports = class preload extends PIXI.Container {
     }
     update() {
         if (this.loaded) {
-            this.scenes.play('battle');
+            this.scenes.play('login');
             this.disable();
         }
     }

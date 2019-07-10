@@ -8,5 +8,9 @@ module.exports = [
         "name": "right",
         "keyCode": 39,
         "opposite": "left"
+    },
+    {
+        "name": "enter",
+        "keyCode": 13
     }
 ]
