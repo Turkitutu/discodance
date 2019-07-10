@@ -2,8 +2,10 @@ class Keyboard {
     constructor() {
         this._regist = {};
         this.keyDown = {};
+        this.preventDefault = true;
         window.addEventListener("keydown", e => {
-            e.preventDefault();
+            if (this.preventDefault)
+                e.preventDefault();
             const key = this._regist[e.keyCode || e.charCode];
             if (key) {
                 this.keyDown[key.name] = 2;
@@ -13,7 +15,8 @@ class Keyboard {
             }
         })
         window.addEventListener("keyup", e => {
-            e.preventDefault();
+            if (this.preventDefault)
+                e.preventDefault();
             const key = this._regist[e.keyCode || e.charCode];
             if (key) {
                 this.keyDown[key.name] = 0;
