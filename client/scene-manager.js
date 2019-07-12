@@ -1,50 +1,45 @@
 const Container = PIXI.Container;
 
 class SceneManager {
-    constructor(app, camera, keyboard) {
+    constructor(app, world, camera, keyboard) {
         this.get = {};
-        this.current = [];
+        this.sceneList = [];
         Container.prototype.app = app;
         Container.prototype.camera = camera;
         Container.prototype.input = keyboard;
+        Container.prototype.world = world;
+        Container.prototype.scenes = this;
         const req = require.context('./scenes', false, /\.js$/);
         for (const filename of req.keys()) {
             const Scene = req(filename),
                   scene = new Scene();
             scene.visible = false;
             this.get[scene.name] = scene;
+            this.sceneList.push(scene);
             scene.scenes = this;
             app.stage.addChild(scene);
         }
     }
-    disable(sceneName) {
-        if (sceneName) {
-            const scene = this.get[sceneName];
-            scene.visible = false;
-            this.current.splice(this.current.indexOf(scene), 1);
-        } else {
-            for (const scene of this.current)
-                scene.visible = false;
-            this.current = [];
+    disable() {
+        for (const scene of this.sceneList) {
+            if (scene.visible) scene.disable();
         }
     }
     play(sceneName, ignoreCamera) {
         const scene = this.get[sceneName];
-        this.current.push(scene);
-        if (scene.play) scene.play();
         if (!ignoreCamera) scene.camera.target(scene);
+        if (scene.play) scene.play();
         scene.visible = true;
     }
     update(delta) {
-        for (const scene of this.current) {
-            if (scene.update) scene.update(delta);
+        for (const scene of this.sceneList) {
+            if (scene.visible && scene.update) scene.update(delta);
         }
     }
 }
 
 Container.prototype.disable = function() {
-    this.scenes.disable(this.name);
+    this.visible = false;
 }
-Container.prototype.scenes = SceneManager;
 
 module.exports = SceneManager;

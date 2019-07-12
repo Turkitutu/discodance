@@ -1,7 +1,6 @@
 const PhysicObject = require('./object.js');
 
 module.exports = class Player extends PhysicObject {
-
     constructor(/*skin/clothes(?)*/) {
         const resources = PIXI.loaders.shared.resources,
               factory = dragonBones.PixiFactory.factory;
@@ -64,5 +63,7 @@ module.exports = class Player extends PhysicObject {
         this.graphics.lineStyle(2, 0xFF0000);
         this.graphics.drawRect(this.body.position.x-this.size[0]/2, this.body.position.y-this.size[1]/2, this.size[0], this.size[1]);
     */}
-
+    static handleMoves(input) {
+        return [input.keyDown['right'] > input.keyDown['left'], input.keyDown['right'] < input.keyDown['left']];
+    }
 }

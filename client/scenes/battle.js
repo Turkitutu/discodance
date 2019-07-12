@@ -1,5 +1,4 @@
-const World = require('../physics/world.js'),
-      PhysicObject = require('../physics/object.js'),
+const PhysicObject = require('../physics/object.js'),
       Player = require('../physics/player.js');
 
 module.exports = class battle extends PIXI.Container {
@@ -10,33 +9,34 @@ module.exports = class battle extends PIXI.Container {
     play() {
         this.playerList = []; // or {} idk;
         
-        this.world = new World({
-            gravity: {
-                x: 0,
-                y: 3
-            },
-            debug: true
-        });
-        
         //TODO: Get room info, add new player, send new player info (?), display players
         
-        this.player = new Player('character', 0, 0);
+        this.player = new Player();
         this.playerList.push(this.player);
-        var test_ground = Matter.Bodies.rectangle(0, 100, 810, 60, { isStatic: true });
-        this.world.add([test_ground, this.player.body]);
+        
+        const test_ground = new PhysicObject({
+            shape: 'rectangle',
+            properties: [0, 100, 810, 60],
+            isStatic: true
+        });
+
+        this.world.add([test_ground, this.player]);
 
         this.addChild(this.player.sprite);
-        /*
-        var a = new PIXI.Graphics();
-        a.lineStyle(2, 0xFF0000);
-        a.drawRect(-810/2, 100-60/2, 810, 60);
-        this.addChild(a);*/
 
-        //this.addChild(this.player.graphics);
         this.addChild(this.world.renderer);
+
+        this.camera.focus([this.player]);
+        this.camera.zoom(0.3)
+    }
+    disable() {
+        this.world.clear();
+        //remove all childs
+
+        super.disable();
     }
     update(delta) {
-        this.player.movement = World.handleMoves(this.input);
+        this.player.movement = Player.handleMoves(this.input);
 
         for (const player of this.playerList) {
             player.update();

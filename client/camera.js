@@ -1,68 +1,97 @@
-function barycenter(objects) {
-    const point = new PIXI.Point(0, 0);
-    const length = 0;
-    for (const obj of objects) {
-        length++;
-        point.x += obj.position.x;
-        point.y += obj.position.y;
-    }
-    point.x /= length;
-    point.y /= length;
-    return point;
-}
 module.exports = class Camera {
-    constructor(origX, origY, speed, tolerance) {
+    constructor(app, speed, tolerance) {
+        this.app = app;
         this.speed = speed || 0.1; //interval [0, 1]
-        this.tolerance = tolerance || 5;
-        this.origin = new PIXI.Point(origX, origY);
-        this._position = new PIXI.Point();
+        this.tolerance = tolerance || 1;
+        this.container = new PIXI.Container();
+        app.stage.addChild(this.container);
+        this.container.position.set(app.width/2, app.height/2);
+        this._barycenter = new PIXI.Point();
+        this._position = new PIXI.Point(0, 0)
     }
     reset() {
         this._focus = null;
         if (this._target) {
             this.zoom(1);
-            this.teleport(this.origin.x, this.origin.y);
+            this.teleport(0, 0);
         } else {
             this._scale = 1;
-            this._position.set(this.origin.x, this.origin.y);
+            this._position.set(0, 0);
         }
     }
     target(scene) {
+        if (this._target) {
+            this._target.setParent(this.app.stage);
+        }
         this._target = scene;
+        this.container.addChild(scene);
         this.reset();
     }
     focus(children) {
-        //children: array
         this._focus = children;
     }
     zoom(scale) {
         this._scale = scale;
-        this._target.scale.set(scale, scale);
+        this.container.scale.set(scale, scale);
     }
     teleport(x, y) {
         this._position.set(x, y);
-        this._target.position.set(x, y);
+        this._target.position.set(-x, -y);
     }
     translate(x, y) {
-        this._target.position.x += x;
-        this._target.position.y += y;
         this._position.x += x;
         this._position.y += y;
+        this._target.position.x -= x;
+        this._target.position.y -= y;
+    }
+    barycenter() {
+        this._barycenter.set(0, 0);
+        let length = 0;
+        for (const obj of this._focus) {
+            length++;
+            this._barycenter.x += obj.body.position.x;
+            this._barycenter.y += obj.body.position.y;
+        }
+        this._barycenter.x /= length;
+        this._barycenter.y /= length;
+        return this._barycenter;
     }
     update(delta) {
         if (this._focus) {
-            const bc = barycenter(this._focus),
-                  posX = (bc.x-this._target.position.x)*this.speed,
-                  posY = (bc.y-this._target.position.y)*this.speed;
-            this.translate(posX > this.tolerance ? posX : 0, posY > this.tolerance ? posY : 0);
+            const bc = this.barycenter(),
+                  posX = bc.x-this._position.x,
+                  posY = bc.y-this._position.y;
+            this.translate(Math.abs(posX) > this.tolerance ? posX*this.speed : posX, Math.abs(posY) > this.tolerance ? posY*this.speed : posY);
             let dx = 0, dy = 0;
             for (const target of this._focus) {
-                dx = Math.max(dx, Math.abs(bc.x-target.position.x)+target.width/2);
-                dy = Math.max(dy, Math.abs(bc.y-target.position.y)+target.height/2);
+                dx = Math.max(dx, Math.abs(bc.x-target.body.position.x)+target.size[0]/2);
+                dy = Math.max(dy, Math.abs(bc.y-target.body.position.y)+target.size[1]/2);
             }
-            const app = this._target.scenes.app,
-                  zoom = (dx/app.ratio > dy ? app.width/dx : app.height/dy)*this._scale;
-            this._target.scale.set(zoom, zoom)
+            const zoom = (dx/this.app.ratio > dy ? this.app.width/dx : this.app.height/dy)*this._scale/2;
+            this.container.scale.set(zoom, zoom);
         }
+    }
+    static handleResize(app) {
+        const resize = () => {
+            let width = window.innerWidth,
+                height = window.innerHeight,
+                baseHeight = width/app.ratio,
+                scale = 1,
+                position = app.stage.position;
+            app.renderer.resize(width, height);
+            if (height >= baseHeight) {
+                position.set(0, (height-baseHeight)/2);
+                scale = width/app.width;
+            } else {
+                position.set((width-height*app.ratio)/2, 0);
+                scale = height/app.height;
+            }
+            app.stage.scale.set(scale, scale);
+        }
+
+        app.ratio = app.width/app.height;
+
+        window.addEventListener('resize', resize);
+        resize();
     }
 }

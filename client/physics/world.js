@@ -13,7 +13,7 @@ class GameWorld {
         this.renderer = new PIXI.Graphics();
     }
     add(obj) {
-        World.add(this.engine.world, obj);
+        World.add(this.engine.world, [].concat(obj).map(p => p.body));
     }
     update(delta) {
         Engine.update(this.engine, delta/FPMS, this.lastDelta ? delta/this.lastDelta : 1);
@@ -23,8 +23,9 @@ class GameWorld {
             this.renderDebug();
         }
     }
-    static handleMoves(input) {
-        return [input.keyDown['right'] > input.keyDown['left'], input.keyDown['right'] < input.keyDown['left']];
+    clear() {
+        //World.clear(this.engine.world);
+        Engine.clear(this.engine);
     }
     get debug() {
         return this._debug;
