@@ -6,8 +6,8 @@ module.exports = class Camera {
         this.container = new PIXI.Container();
         app.stage.addChild(this.container);
         this.container.position.set(app.width/2, app.height/2);
+        this.bounds = new PIXI.Point(Infinity, Infinity);
         this._barycenter = new PIXI.Point();
-        this._position = new PIXI.Point(0, 0)
     }
     reset() {
         this._focus = null;
@@ -16,7 +16,6 @@ module.exports = class Camera {
             this.teleport(0, 0);
         } else {
             this._scale = 1;
-            this._position.set(0, 0);
         }
     }
     target(scene) {
@@ -35,12 +34,9 @@ module.exports = class Camera {
         this.container.scale.set(scale, scale);
     }
     teleport(x, y) {
-        this._position.set(x, y);
         this._target.position.set(-x, -y);
     }
     translate(x, y) {
-        this._position.x += x;
-        this._position.y += y;
         this._target.position.x -= x;
         this._target.position.y -= y;
     }
@@ -59,15 +55,15 @@ module.exports = class Camera {
     update(delta) {
         if (this._focus) {
             const bc = this.barycenter(),
-                  posX = bc.x-this._position.x,
-                  posY = bc.y-this._position.y;
+                  posX = bc.x+this._target.position.x,
+                  posY = bc.y+this._target.position.y;
             this.translate(Math.abs(posX) > this.tolerance ? posX*this.speed : posX, Math.abs(posY) > this.tolerance ? posY*this.speed : posY);
             let dx = 0, dy = 0;
             for (const target of this._focus) {
                 dx = Math.max(dx, Math.abs(bc.x-target.body.position.x)+target.size[0]/2);
                 dy = Math.max(dy, Math.abs(bc.y-target.body.position.y)+target.size[1]/2);
             }
-            const zoom = (dx/this.app.ratio > dy ? this.app.width/dx : this.app.height/dy)*this._scale/2;
+            const zoom = dx/this.app.fullRatio > dy ? this.app.fullWidth*this._scale/(dx*2) : this.app.fullHeight*this._scale/(dy*2);
             this.container.scale.set(zoom, zoom);
         }
     }
@@ -79,12 +75,17 @@ module.exports = class Camera {
                 scale = 1,
                 position = app.stage.position;
             app.renderer.resize(width, height);
+            app.fullRatio = width/height;
             if (height >= baseHeight) {
                 position.set(0, (height-baseHeight)/2);
                 scale = width/app.width;
+                app.fullWidth = app.width;
+                app.fullHeight = app.width/app.fullRatio;
             } else {
                 position.set((width-height*app.ratio)/2, 0);
                 scale = height/app.height;
+                app.fullWidth = app.height*app.fullRatio;
+                app.fullHeight = app.height;
             }
             app.stage.scale.set(scale, scale);
         }

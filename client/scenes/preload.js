@@ -31,6 +31,9 @@ module.exports = class preload extends PIXI.Container {
                 bar_inner.texture = bar_inner.texture;
             })
             .load((loader, resources) => {
+                const factory = dragonBones.PixiFactory.factory;
+                factory.parseDragonBonesData(resources.character.data);
+                factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);
                 this.loaded = true;
             });
         });

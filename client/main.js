@@ -16,6 +16,8 @@ app.height = 1440;
 Camera.handleResize(app);
 
 window.onload = () => {
+    document.body.style.overflow = 'hidden'
+    app.renderer.view.style.position = 'absolute';
     app.view.style.display = 'block';
     document.body.appendChild(app.view);
 }

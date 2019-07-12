@@ -2,14 +2,10 @@ const PhysicObject = require('./object.js');
 
 module.exports = class Player extends PhysicObject {
     constructor(/*skin/clothes(?)*/) {
-        const resources = PIXI.loaders.shared.resources,
-              factory = dragonBones.PixiFactory.factory;
-        factory.parseDragonBonesData(resources.character.data);
-        factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);
         super({
             shape: 'rectangle',
             sprite: {
-                object: factory.buildArmatureDisplay('body', 'character'),
+                object: dragonBones.PixiFactory.factory.buildArmatureDisplay('body', 'character'),
                 size: [30, 100],
                 anchor: [0, 0.5],
                 scale: [0.3, 0.3]
