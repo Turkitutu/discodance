@@ -2,7 +2,8 @@ const SceneManager = require('./scene-manager.js'),
       Camera = require('./camera.js'),
       Keyboard = require('./keyboard.js'),
       World = require('./physics/world.js'),
-      keysDefault = require('./utils/keys-default.js');
+      keysDefault = require('./utils/keys-default.js'),
+      cipher = require("./utils/cipher.js");
 
 const app = new PIXI.Application({
     width: window.innerWidth,
@@ -21,6 +22,10 @@ window.onload = () => {
     app.view.style.display = 'block';
     document.body.appendChild(app.view);
 }
+const Cipher = new cipher();
+Cipher.generateConnectionKey();
+Cipher.generateSecretKeys();
+console.log(Cipher);
 
 const world = new World({
     gravity: {
