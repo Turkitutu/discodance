@@ -4,7 +4,7 @@ const WebSocket = require("ws"),
 
 class Server {
 	constructor() {
-		this.settings = new Settings("./include/settings.json");
+		this.settings = new Settings("include/settings.json");
 		this.packetManager = new PacketManager();
 		console.log(this.packetManager);
 	}

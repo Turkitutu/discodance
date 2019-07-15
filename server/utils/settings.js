@@ -1,12 +1,13 @@
-const fs = require("fs");
+const fs = require("fs"),
+	path = require("path");
 
-const Settings = function(path) {
-	if (path in [undefined, "", false, true, null])
+const Settings = function(filepath) {
+	if (filepath in [undefined, "", false, true, null])
 		throw new Error("Argument one should be string.");
-	this.path = path;
+	this.path = path.resolve(__dirname, '..', filepath);
 	if (!fs.existsSync(this.path))
 		throw new Error("File is not exists anymore.");
-	this.data = JSON.parse(fs.readFileSync(path, "utf-8"));
+	this.data = JSON.parse(fs.readFileSync(this.path, "utf-8"));
 }
 Settings.prototype.updateFile = function(data) {
 	if (typeof data !== "object")

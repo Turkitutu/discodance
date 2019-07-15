@@ -1,8 +1,10 @@
 const express = require('express'),
       app = express();
 
+require('./server/index');
+
 app.use(express.static('public'));
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(8080, () => {
     console.log('listening');
 });
