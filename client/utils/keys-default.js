@@ -1,4 +1,4 @@
-`qmodule.exports = [
+module.exports = [
     {
         "name": "left",
         "keyCode": 37,
