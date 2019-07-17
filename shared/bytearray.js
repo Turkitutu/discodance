@@ -10,7 +10,6 @@ class ByteArray {
             readPos : 0,
             writePos : 0
         }
-        return this;
     }
 
     writeUInt(int) {
@@ -28,7 +27,7 @@ class ByteArray {
             this.data.writeUInt32BE(3221225472 + int, this.writeOffset);
             this.writeOffset += 4;
         }
-        return this
+        return this;
     }
 
     writeInt(int) {
@@ -77,6 +76,15 @@ class ByteArray {
         return this;
     }
 
+    writeBoolean(bool) {
+        if (this.currentBool.writeOffset !== this.writeOffset-1 || this.currentBool.writePos > 7) {
+            this.currentBool.writeOffset = this.writeOffset++;
+            this.currentBool.writePos = 0;
+        }
+        this.data.writeUInt8(this.data[this.currentBool.writeOffset] | ((bool ? 1 : 0) << this.currentBool.writePos++), this.currentBool.writeOffset);
+        return this;
+    }
+
     readUInt() {
         let data = this.data.readUInt8(this.readOffset++),
             bytes = data >> 6;
@@ -103,31 +111,16 @@ class ByteArray {
         return string;
     }
 
-    writeBoolean(bool) {
-        if (this.currentBool.writeOffset !== this.writeOffset-1 || this.currentBool.writePos > 7) {
-            this.currentBool.writeOffset = this.writeOffset++;
-            this.currentBool.writePos = 0;
-        }
-        this.data.writeUInt8(this.data[this.currentBool.writeOffset] | ((bool ? 1 : 0) << this.currentBool.writePos++), this.currentBool.writeOffset);
-        return this;
-    }
     readBoolean() {
         if (this.currentBool.readOffset !== this.readOffset-1 || this.currentBool.readPos > 7) {
             this.currentBool.readOffset = this.readOffset++;
             this.currentBool.readPos = 0;
         }
-        return !!(1 & (this.data[this.currentBool.readOffset] >> this.currentBool.readPos++))
+        return !!(1 & (this.data[this.currentBool.readOffset] >> this.currentBool.readPos++));
     }
+
 }
 
 
 module.exports = ByteArray;
 
-/*/
-b = new ByteArray(15)
-
-b.writeUInt(255)
-console.log(b.readUInt())
-console.log(b)
-
-/*/
