@@ -1,7 +1,7 @@
 const express = require('express'),
       app = express();
 
-require('./server/index');
+require('./server');
 
 app.use(express.static('public'));
 
