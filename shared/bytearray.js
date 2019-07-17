@@ -51,23 +51,6 @@ class ByteArray {
         return this;
     }
 
-    writeString(string){
-        var length = Buffer.byteLength(string, 'utf8');
-        this.writeUInt(length)
-        this.data.write(string, this.writeOffset)
-        this.writeOffset += length;
-        return this;
-    }
-
-    writeBoolean(bool) {
-        if (this.currentBool.writeOffset !== this.writeOffset-1 || this.currentBool.writePos > 7) {
-            this.currentBool.writeOffset = this.writeOffset++;
-            this.currentBool.writePos = 0;
-        }
-        this.data.writeUInt8(this.data[this.currentBool.writeOffset] | ((bool ? 1 : 0) << this.currentBool.writePos++), this.currentBool.writeOffset);
-        return this;
-    }
-
     readInt() {
         let data = this.data.readUInt8(this.readOffset++),
             bytes = data >> 6,
@@ -85,6 +68,15 @@ class ByteArray {
         return positive ? data : -data;
     }
      
+
+    writeString(string){
+        var length = Buffer.byteLength(string, 'utf8');
+        this.writeUInt(length)
+        this.data.write(string, this.writeOffset)
+        this.writeOffset += length;
+        return this;
+    }
+
     readUInt() {
         let data = this.data.readUInt8(this.readOffset++),
             bytes = data >> 6;
@@ -111,6 +103,14 @@ class ByteArray {
         return string;
     }
 
+    writeBoolean(bool) {
+        if (this.currentBool.writeOffset !== this.writeOffset-1 || this.currentBool.writePos > 7) {
+            this.currentBool.writeOffset = this.writeOffset++;
+            this.currentBool.writePos = 0;
+        }
+        this.data.writeUInt8(this.data[this.currentBool.writeOffset] | ((bool ? 1 : 0) << this.currentBool.writePos++), this.currentBool.writeOffset);
+        return this;
+    }
     readBoolean() {
         if (this.currentBool.readOffset !== this.readOffset-1 || this.currentBool.readPos > 7) {
             this.currentBool.readOffset = this.readOffset++;
@@ -122,3 +122,12 @@ class ByteArray {
 
 
 module.exports = ByteArray;
+
+/*/
+b = new ByteArray(15)
+
+b.writeUInt(255)
+console.log(b.readUInt())
+console.log(b)
+
+/*/
