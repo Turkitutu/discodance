@@ -5,7 +5,8 @@
   "description": "HTML5 game",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --config webpack.config.js",
+    "start": "webpack --config webpack.config.js && npm run app",
+    "app": "node app.js",
     "hot": "webpack-dev-server --content-base public --hot --inline"
   },
   "keywords": [],

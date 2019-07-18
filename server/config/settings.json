@@ -2,7 +2,6 @@
 	"servers": {
 		"discodance": {"port": 1661}
 	},
-	"version": "1.0.0",
 	"database": {
 		"username": "root",
 		"password": "",

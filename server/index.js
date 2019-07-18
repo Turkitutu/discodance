@@ -1,5 +1,4 @@
-const Server = require("./server.js"),
-	Client = require("./client.js");
- 
- var DDServer = new Server();
-DDServer.startServer();
+const CogManager = require("./core/cog-manager");
+
+const cogManager = new CogManager();
+cogManager.startServer();
