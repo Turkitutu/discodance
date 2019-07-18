@@ -10,7 +10,7 @@ class ByteArray {
             readPos : 0,
             writePos : 0
         }
-        if (typeof buf !== 'undefined') {
+        if (buf !== undefined) {
             this.data = Buffer.from(buf);
             this.writeOffset = this.data.length;
         } else {
@@ -18,42 +18,36 @@ class ByteArray {
         }
     }
 
+    writeBytes(int, length){
+        this.checkSize(length);
+        this.data.writeUIntBE(int, this.writeOffset, length);
+        this.writeOffset += length;
+    }
+
     writeUInt(int) {
-        this.checkSize(4);
         if (int < 64) {
-            this.data.writeUInt8(int, this.writeOffset++);
+            this.writeBytes(int, 1);
         } else if (int < 16384) {
-            this.data.writeUInt16BE(16384 | int, this.writeOffset);
-            this.writeOffset += 2;
+            this.writeBytes(16384 | int, 2);
         } else if (int < 4194304) {
-            const n = 8388608 | int;
-            this.data.writeUInt8(255 & (n >> 16) , this.writeOffset++);
-            this.data.writeUInt16BE(65535 &  n, this.writeOffset);
-            this.writeOffset += 2;
+            this.writeBytes(8388608 | int, 3);
         } else {
-            this.data.writeUInt32BE(3221225472 + int, this.writeOffset);
-            this.writeOffset += 4;
+            this.writeBytes(3221225472 + int, 4);
         }
         return this;
     }
 
     writeInt(int) {
-        this.checkSize(4);
         const positive = int > 0;
         int = positive ? int : -int;
         if (int < 32) {
-            this.data.writeUInt8((positive ? 0 : 32) | int, this.writeOffset++);
+            this.writeBytes((positive ? 0 : 32) | int, 1);
         } else if (int < 8192) {
-            this.data.writeUInt16BE((positive ? 16384 : 24576) | int, this.writeOffset);
-            this.writeOffset += 2;
+            this.writeBytes((positive ? 16384 : 24576) | int, 2);
         } else if (int < 2097152) {
-            const n = (positive ? 8388608 : 10485760) | int;
-            this.data.writeUInt8(255 & (n >> 16) , this.writeOffset++);
-            this.data.writeUInt16BE(65535 &  n, this.writeOffset);
-            this.writeOffset += 2;
+            this.writeBytes((positive ? 8388608 : 10485760) | int, 3);
         } else {
-            this.data.writeUInt32BE((positive ? 3221225472 : 3758096384) + int, this.writeOffset);
-            this.writeOffset += 4;
+            this.writeBytes((positive ? 3221225472 : 3758096384) + int, 4);
         }
         return this;
     }
@@ -77,38 +71,38 @@ class ByteArray {
         return this;
     }
 
+    readBytes(length){
+        const data = this.data.readUIntBE(this.readOffset, length);
+        this.readOffset += length;
+        return data;
+    }
+
     readUInt() {
-        let data = this.data.readUInt8(this.readOffset++),
+        let data = this.readBytes(1),
             bytes = data >> 6;
         data &= 63;
         if (bytes == 0) {
             return data;
         } else if (bytes == 1) {
-            return (data << 8) | this.data.readUInt8(this.readOffset++);
+            return (data << 8) | this.readBytes(1);
         } else if (bytes == 2) {
-            data = (data << 16) | this.data.readUInt16BE(this.readOffset);
-            this.readOffset += 2;
-            return data;
+            return (data << 16) | this.readBytes(2);
         } else {
-            data = (data << 24) + (this.data.readUInt8(this.readOffset++) << 16) + this.data.readUInt16BE(this.readOffset);
-            this.readOffset += 2;
-            return data;
+            return (data << 24) + this.readBytes(3);
         }
     }
 
     readInt() {
-        let data = this.data.readUInt8(this.readOffset++),
+        let data = this.readBytes(1),
             bytes = data >> 6,
             positive = !((data >> 5) & 1);
         data &= 31;
         if (bytes == 1) {
-            data = (data << 8) | this.data.readUInt8(this.readOffset++);
+            return (data << 8) | this.readBytes(1);
         } else if (bytes == 2) {
-            data = (data << 16) | this.data.readUInt16BE(this.readOffset);
-            this.readOffset += 2;
+            return (data << 16) | this.readBytes(2);
         } else if (bytes) {
-            data = (data << 24) + (this.data.readUInt8(this.readOffset++) << 16) + this.data.readUInt16BE(this.readOffset);
-            this.readOffset += 2;
+            return (data << 24) + this.readBytes(3);
         }
         return positive ? data : -data;
     }
@@ -134,7 +128,7 @@ class ByteArray {
         }
     }
 
-    get buf() {
+    get buffer() {
         return this.data.slice(0, this.writeOffset);
     }
 
