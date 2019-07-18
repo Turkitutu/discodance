@@ -98,11 +98,11 @@ class ByteArray {
             positive = !((data >> 5) & 1);
         data &= 31;
         if (bytes == 1) {
-            return (data << 8) | this.readBytes(1);
+            data = (data << 8) | this.readBytes(1);
         } else if (bytes == 2) {
-            return (data << 16) | this.readBytes(2);
+            data = (data << 16) | this.readBytes(2);
         } else if (bytes) {
-            return (data << 24) + this.readBytes(3);
+            data = (data << 24) + this.readBytes(3);
         }
         return positive ? data : -data;
     }
