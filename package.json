@@ -5,18 +5,19 @@
   "description": "HTML5 game",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --config webpack.config.js && npm run app",
+    "start": "npm run webpack && npm run app",
+    "webpack": "webpack --config webpack.config.js",
     "app": "node app.js",
     "hot": "webpack-dev-server --content-base public --hot --inline"
   },
   "keywords": [],
   "dependencies": {
-    "express": "^4.17.1",
     "ws": "^7.1.0"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "dotenv": "^8.0.0",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5",
     "webpack-dev-server": "^3.7.2"

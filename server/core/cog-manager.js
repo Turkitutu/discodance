@@ -13,7 +13,7 @@ class CogManager {
 		});
 	}
 	startServer() {
-		this.server = new WebSocket.Server({port: settings.servers.discodance.port});
+		this.server = new WebSocket.Server({port: process.env.SERVER_PORT});
 		this.server.on("connection", ws => {
 			ws.on("message", message => {
 				const packet = new Packet(message, ws),
