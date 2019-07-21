@@ -45,7 +45,8 @@ module.exports = class login extends PIXI.Container {
 
     update(delta){
         if (this.input.keyDown.enter) {
-            this.scenes.play('battle');
+            this.world.fieldId = 0;
+            this.scenes.play('field');
             this.disable();
         }
     }

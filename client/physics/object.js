@@ -1,14 +1,18 @@
-const Bodies = Matter.Bodies,
+const Emitter = require('../utils/emitter'),
+      Bodies = Matter.Bodies,
       Body = Matter.Body;
 
-class PhysicObject {
+class PhysicObject extends Emitter {
     constructor(options) {
+        super();
+
         if (options.fixedRotation) {
             options.inertia = Infinity;   
         }
 
         options.properties.push(options);
         this.body = Bodies[options.shape].apply(null, options.properties);
+        this.body.object = this;
 
         if (options.sprite) {
             this.sprite = options.sprite.object;
@@ -20,6 +24,22 @@ class PhysicObject {
 
         this._vector = { x: 0, y: 0 };
         this._force = { x: 0, y: 0 };
+        this._events = {};
+    }
+    static createColorSpot(options) {
+        options.isSensor = true;
+        options.isStatic = true;
+        const obj = new this(options);
+        obj.id = options.id;
+        return obj
+        .on('collisionStart', player => {
+            if (player.isPlayer) player.color = obj; 
+            alert('Welcome!');
+        })
+        .on('collisionEnd', player => {
+            if (player.isPlayer && player.color == obj) player.color = null;
+            alert('GoodBye!');
+        });
     }
     teleport(x, y) {
         this._vector.x = x;

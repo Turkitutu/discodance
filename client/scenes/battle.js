@@ -1,16 +1,16 @@
 const PhysicObject = require('../physics/object.js'),
       Player = require('../physics/player.js');
 
-module.exports = class battle extends PIXI.Container {
+module.exports = class Battle extends PIXI.Container {
     constructor() {
         super();
         this.name = 'battle';
-        this.playerList = []; // or {} idk;
-        this.objectList = [];
     }
     play() {
         //TODO: Get room info, add new player, send new player info (?), display players
-        
+        const fieldId = 0;
+
+        this.field = this.scenes.play('field', false, fieldId);
         this.player = new Player();
         this.player2 = new Player();
         
@@ -31,13 +31,11 @@ module.exports = class battle extends PIXI.Container {
         this.camera.zoom(0.7);
     }
     disable() {
-        this.world.clear();
         for (const child of this.children)
             this.removeChild(child);
-        this.playerList = [];
-        this.objectList = [];
 
-        super.disable();
+        this.visible = false;
+        this.scenes.disable();
     }
     update(delta) {
         this.player.movement = Player.handleMoves(this.input);
@@ -48,13 +46,5 @@ module.exports = class battle extends PIXI.Container {
         }
 
         this.world.update(delta);
-    }
-    addPlayer(player) {
-        this.playerList.push(player);
-        this.addObject(player);
-        this.addChild(player.sprite)
-    }
-    addObject(obj) {
-        this.objectList.push(obj);
     }
 }
