@@ -2,6 +2,7 @@ const SceneManager = require('./scene-manager.js'),
       Camera = require('./camera.js'),
       Keyboard = require('./keyboard.js'),
       World = require('./physics/world.js'),
+      Connection = require("./connection.js"),
       keysDefault = require('./utils/keys-default.js'),
       cipher = require("./utils/cipher.js");
 
@@ -22,6 +23,7 @@ window.onload = () => {
     app.view.style.display = 'block';
     document.body.appendChild(app.view);
 }
+
 const Cipher = new cipher();
 Cipher.generateConnectionKey();
 Cipher.generateSecretKeys();
@@ -35,12 +37,14 @@ const world = new World({
     debug: true
 });
 
+const connection = new Connection();
+
 const camera = new Camera(app);
 
 const keyboard = new Keyboard();
 keyboard.batchRegister(keysDefault);
 
-const sceneManager = new SceneManager(app, world, camera, keyboard);
+const sceneManager = new SceneManager(app, connection, world, camera, keyboard);
 
 sceneManager.play('preload');
 

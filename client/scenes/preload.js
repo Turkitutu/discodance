@@ -36,10 +36,11 @@ module.exports = class preload extends PIXI.Container {
                 factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);
                 this.loaded = true;
             });
+            this.connection.connect("localhost", 3000);
         });
     }
     update() {
-        if (this.loaded) {
+        if (this.loaded && this.connection.connected) {
             this.scenes.play('login');
             this.disable();
         }

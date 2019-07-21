@@ -52,5 +52,3 @@ module.exports = class login extends PIXI.Container {
     }
     
 }
-
-
