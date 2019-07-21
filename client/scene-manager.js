@@ -1,10 +1,11 @@
 const Container = PIXI.Container;
 
 class SceneManager {
-    constructor(app, world, camera, keyboard) {
+    constructor(app, connection, world, camera, keyboard) {
         this.get = {};
         this.sceneList = [];
         Container.prototype.app = app;
+        Container.prototype.connection = connection;
         Container.prototype.camera = camera;
         Container.prototype.input = keyboard;
         Container.prototype.world = world;
@@ -19,6 +20,17 @@ class SceneManager {
             scene.scenes = this;
             app.stage.addChild(scene);
         }
+
+        connection.socket.onmessage = function(event){
+            for (const scene of this.sceneList) {
+                // TODO : cogs system
+                if (scene.onmessage) scene.onmessage(event);
+            }
+        }
+        connection.socket.onclose = function(event){
+            // TODO : Go to "The connection to the server has been interrupted" scene
+        }
+
     }
     disable() {
         for (const scene of this.sceneList) {
