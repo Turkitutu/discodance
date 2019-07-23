@@ -11,19 +11,20 @@ module.exports = class Connection {
         this.ip = ip;
         this.port = port;
         this.socket = new WebSocket("ws://"+ip+":"+port);
-        this.socket.onerror = function(error) {
+        this.socket.onerror = (error) => {
             console.error(error);
         };
-        this.socket.onopen = function(){
-            this.connected = true;
-        }
 
-        this.socket.onclose = function(){
+        this.socket.onopen = () => {
+            this.connected = true;
+        };
+
+        this.socket.onclose = () => {
             if (this.connected) this.onclose();
             this.connected = false;
-        }
+        };
 
-        this.socket.onmessage = function(event){
+        this.socket.onmessage = (event) => {
             const data = new ByteArray(event.data);
             const cog = data.readInt(),
                   id = data.readInt();
@@ -32,7 +33,7 @@ module.exports = class Connection {
                     this.incoming[cog][id](data);
                 }
             }
-        }
+        };
     }
 
     packet(incoming, cog, id, func){
