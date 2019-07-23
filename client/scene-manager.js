@@ -1,4 +1,5 @@
 const Container = PIXI.Container;
+const ByteArray = require('../shared/bytearray.js')
 
 class SceneManager {
     constructor(app, connection, world, camera, keyboard) {
@@ -21,13 +22,7 @@ class SceneManager {
             app.stage.addChild(scene);
         }
 
-        connection.socket.onmessage = function(event){
-            for (const scene of this.sceneList) {
-                // TODO : cogs system
-                if (scene.onmessage) scene.onmessage(event);
-            }
-        }
-        connection.socket.onclose = function(event){
+        connection.onclose = function(){
             // TODO : Go to "The connection to the server has been interrupted" scene
         }
 

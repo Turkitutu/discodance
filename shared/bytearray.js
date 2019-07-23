@@ -1,3 +1,5 @@
+const Buffer = require('buffer').Buffer;
+
 class ByteArray {
 
     constructor(buf){

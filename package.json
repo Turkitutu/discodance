@@ -11,6 +11,7 @@
   },
   "keywords": [],
   "dependencies": {
+    "buffer": "^5.2.1",
     "ws": "^7.1.0"
   },
   "author": "",

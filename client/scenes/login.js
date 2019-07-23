@@ -1,3 +1,6 @@
+const cogs = require('../utils/enums').cogs,
+      ByteArray = require('.../shared/bytearray.js');
+
 module.exports = class login extends PIXI.Container {
     constructor() {
         super();
@@ -40,7 +43,20 @@ module.exports = class login extends PIXI.Container {
         nickname.on('blur', () => {this.input.preventDefault = true});
         nickname.on('focus', () => {this.input.preventDefault = false});  
         password.on('blur', () => {this.input.preventDefault = true});
-        password.on('focus', () => {this.input.preventDefault = false}) ;    
+        password.on('focus', () => {this.input.preventDefault = false}) ;   
+
+        // Exemple
+        this.connection.packet(false, cogs.login.id, cogs.login.login, function(name, pass){
+            // do something
+            return new ByteArray().writeString(name).writeString(pass);
+        });
+
+        this.connection.send(cogs.login.id, cogs.login.login, 'yatsuki', '12345679');
+
+        this.connection.packet(true, cogs.login.id, cogs.login.result, function(data){
+            // do something
+        });
+
     }
 
     update(delta){
