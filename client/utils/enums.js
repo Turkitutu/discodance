@@ -7,7 +7,7 @@ module.exports = {
         login : {
             id : 2,
             login : 1,
-            login_result : 2,
+            result : 2,
             create_account : 3
         }
     }
