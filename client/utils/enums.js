@@ -3,7 +3,7 @@ module.exports = {
         community_platform : {
             id : 1,
             send_room_message : 1
-        }
+        },
         login : {
             id : 2,
             login : 1,

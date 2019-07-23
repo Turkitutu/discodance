@@ -1,5 +1,5 @@
-const cogs = require('../utils/enums').cogs,
-      ByteArray = require('.../shared/bytearray.js');
+const cogs = require('../utils/enums.js').cogs,
+      ByteArray = require('../../shared/bytearray.js');
 
 module.exports = class login extends PIXI.Container {
     constructor() {

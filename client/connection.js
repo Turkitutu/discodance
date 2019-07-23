@@ -19,8 +19,8 @@ module.exports = class Connection {
         }
 
         this.socket.onclose = function(){
+            if (this.connected) this.onclose();
             this.connected = false;
-            this.onclose();
         }
 
         this.socket.onmessage = function(event){
