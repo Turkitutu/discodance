@@ -1,5 +1,4 @@
-const cogs = require('../utils/enums').cogs,
-      ByteArray = require('../../shared/bytearray.js');
+const cogs = require('../utils/enums.js').cogs;
 
 module.exports = class login extends PIXI.Container {
     constructor() {
@@ -22,40 +21,6 @@ module.exports = class login extends PIXI.Container {
         logo.scale.set(2, 2);
         logo.position.set(-logo.width/2, -700);
         this.addChild(logo);
-        /*
-        var nickname = new PIXI.TextInput(style);
-        nickname.substituteText = false;
-        nickname.x = -nickname.width/2;
-        nickname.y = 100;
-        nickname.placeholder = 'Nickname';
-        this.addChild(nickname);
-        nickname.focus();
-        this.input.preventDefault = false;
-
-        var password = new PIXI.TextInput(style);
-        password.substituteText = false;
-        password.disabled = true;
-        password.x = -password.width/2;
-        password.y = 130;
-        password.placeholder = 'Password';
-        this.addChild(password);  
-
-        nickname.on('blur', () => {this.input.preventDefault = true});
-        nickname.on('focus', () => {this.input.preventDefault = false});  
-        password.on('blur', () => {this.input.preventDefault = true});
-        password.on('focus', () => {this.input.preventDefault = false}) ;*/   
-        /*
-        // Exemple
-        this.connection.packet(false, cogs.login.id, cogs.login.login, function(name, pass){
-            // do something
-            return new ByteArray().writeString(name).writeString(pass);
-        });
-
-        this.connection.send(cogs.login.id, cogs.login.login, 'yatsuki', '12345679');
-
-        this.connection.packet(true, cogs.login.id, cogs.login.result, function(data){
-            // do something
-        });*/
 
     }
 
