@@ -1,6 +1,6 @@
 const Emitter = require('../utils/emitter'),
-      Bodies = Matter.Bodies,
-      Body = Matter.Body;
+      Bodies = Matter.$Bodies,
+      Body = Matter.$Body;
 
 class PhysicObject extends Emitter {
     constructor(options) {

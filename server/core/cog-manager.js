@@ -1,7 +1,6 @@
 const WebSocket = require("ws"),
 	  Packet = require("./packet.js"),
-	  settings = require("../config/settings"),
-	  cogList = require("../config/cogs");
+	  cogList = require("../utils/cogs");
 
 class CogManager {
 	constructor() {
