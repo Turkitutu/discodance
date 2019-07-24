@@ -4,10 +4,10 @@ class Keyboard {
         this.keyDown = {};
         this.wasModified = {};
         this.preventDefault = true;
-        window.addEventListener("keydown", e => {
+        window.$addEventListener("keydown", e => {
             if (this.preventDefault)
-                e.preventDefault();
-            const key = this._regist[e.keyCode || e.charCode];
+                e.$preventDefault();
+            const key = this._regist[e.$keyCode || e.$charCode];
             if (key) {
                 if (!this.keyDown[key.ref])
                     this.wasModified[key.ref] = true;
@@ -17,10 +17,10 @@ class Keyboard {
                 }
             }
         })
-        window.addEventListener("keyup", e => {
+        window.$addEventListener("keyup", e => {
             if (this.preventDefault)
-                e.preventDefault();
-            const key = this._regist[e.keyCode || e.charCode];
+                e.$preventDefault();
+            const key = this._regist[e.$keyCode || e.$charCode];
             if (key) {
                 if (this.keyDown[key.ref])
                     this.wasModified[key.ref] = true;
@@ -38,7 +38,7 @@ class Keyboard {
         }
     }
     batchRegister(keys) {
-        for (const key of Object.keys(keys)) {
+        for (const key of Object.$keys(keys)) {
             keys[key].ref = key;
             this.registerKey(keys[key]);
         }

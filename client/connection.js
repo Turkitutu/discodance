@@ -10,28 +10,27 @@ module.exports = class Connection {
     connect(ip, port){
         this.ip = ip;
         this.port = port;
-        this.connected = true;
-        /*
+
         this.socket = new WebSocket("ws://"+ip+":"+port);
-        this.socket.onerror = (error) => {
-            console.error(error);
+        this.socket.$onerror = (error) => {
+            console.$error(error);
         };
 
-        this.socket.onopen = () => {
+        this.socket.$onopen = () => {
             this.connected = true;
         };
 
-        this.socket.onclose = () => {
+        this.socket.$onclose = () => {
             if (this.connected) this.onclose();
             this.connected = false;
         };
 
-        this.socket.onmessage = (event) => {
-            const data = new ByteArray(event.data);
+        this.socket.$onmessage = (event) => {
+            const data = new ByteArray(event.$data);
             const cog = data.readInt(),
                   id = data.readInt();
-            if (this.incoming[cog]){
-                if (this.incoming[cog][id]){
+            if (this.incoming[cog]) {
+                if (this.incoming[cog][id]) {
                     this.incoming[cog][id](data);
                 }
             }
@@ -42,7 +41,7 @@ module.exports = class Connection {
         if (incoming){
             if (!this.incoming[id]) this.incoming[id] = {};
             this.incoming[cog][id] = func;
-        }else{
+        } else {
             if (!this.ingoing[id]) this.ingoing[id] = {};
             this.ingoing[cog][id] = func;
         }
@@ -52,7 +51,7 @@ module.exports = class Connection {
         if (this.ingoing[cog]){
             if (this.ingoing[cog][id]){
                 const data = this.ingoing[cog][id](...args);
-                this.socket.send(new ByteArray().writeInt(cog).writeInt(id).buffer + data.buffer);
+                this.socket.$send(new ByteArray().writeInt(cog).writeInt(id).buffer + data.$buffer);
             }
         }
     }

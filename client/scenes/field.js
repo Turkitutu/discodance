@@ -4,7 +4,7 @@ const PhysicObject = require('../physics/object.js'),
           require('../fields/Hollywood.js'),
       ];
 
-class Field extends PIXI.Container {
+class Field extends PIXI.$Container {
     constructor() {
         super();
         this.name = 'field';
@@ -19,9 +19,9 @@ class Field extends PIXI.Container {
     play() {
         this.field = fields[this.world.fieldId];
         PhysicObject.colorTarget = this.playerList;
-        PIXI.loaders.shared
-            .add(this.field.assets)
-            .load((loader, resources) => {
+        PIXI.$loaders.$shared
+            .$add(this.field.assets)
+            .$load((loader, resources) => {
                 this.field.create(this, resources);
                 this.loaded = true;
                 this.load();
@@ -33,7 +33,7 @@ class Field extends PIXI.Container {
 
         this.world.add(this.objectList);
 
-        this.addChild(this.world.renderer);
+        this.$addChild(this.world.renderer);
 
         this.camera.focus(this.playerList);
         this.camera.zoom(0.7);
@@ -52,9 +52,9 @@ class Field extends PIXI.Container {
     disable() {
         this.reset();
         this.world.clear();
-        for (const child of this.children) {
-            this.removeChild(child);
-            child.destroy(true);
+        for (const child of this.$children) {
+            this.$removeChild(child);
+            child.$destroy(true);
         }
 
         super.disable();
@@ -62,12 +62,12 @@ class Field extends PIXI.Container {
     addPlayer(player) {
         const position = this.field.spawn[this.spawnOffset++] || this.field.spawn[this.spawnOffset=0];
         player.teleport(position[0], position[1]);
-        this.playerList.push(player);
+        this.playerList.$push(player);
         this.addObject(player);
     }
     addObject(obj) {
-        this.objectList.push(obj);
-        if (obj.sprite) this.addChild(obj.sprite);
+        this.objectList.$push(obj);
+        if (obj.sprite) this.$addChild(obj.sprite);
     }
 }
 

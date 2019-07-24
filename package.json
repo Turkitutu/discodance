@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run client",
-    "client": "webpack --config webpack.config.js"
+    "client": "node webpack.config.js"
   },
   "keywords": [],
   "dependencies": {

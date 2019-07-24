@@ -8,7 +8,7 @@ function create(field, resources) {
     field.addObject(new PhysicObject({
         shape: 'rectangle',
         properties: [0, 100, 810, 60],
-        'isStatic': true
+        $isStatic: true
     }));
     field.addObject(PhysicObject.createColorSpot({
         shape: 'rectangle',
