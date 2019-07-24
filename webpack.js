@@ -1,6 +1,9 @@
 const webpack = require('webpack'),
       path = require('path'),
-      TerserPlugin = require('terser-webpack-plugin');
+      fs = require('fs'),
+      TerserPlugin = require('terser-webpack-plugin'),
+      Terser = require("terser");
+      babel = require("@babel/core");
 
 require('dotenv').config();
 
@@ -70,23 +73,12 @@ var config = {
                 }
             })
         ]
-    },
-    /*
-    module: {
-        rules: [
-            {
-                test: /\.m?js$/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env']
-                    }
-                }
-            }
-        ]
     }
-    */
 };
+
+var babelOptions = {
+    presets: ["@babel/preset-env"]
+}
 
 var compiler = webpack(config);
 
@@ -94,5 +86,16 @@ compiler.run(function (err, stats) {
     if (err) throw err
     process.stdout.write(stats.toString({
         colors: true
-    }) + '\n\n')
+    }) + '\n\nTranspiling with Babel...\n\n');
+    const filename = path.resolve(config.output.path, 'main.js');
+    fs.readFile(filename, (err, data) => {
+        if (err) throw err;
+        babel.transform(data, babelOptions, (err, results) => {
+            if (err) throw err;
+            fs.writeFile(filename, Terser.minify(results.code, {toplevel:true}).code, err => {
+                if (err) throw err;
+                process.stdout.write('Success!\n\n');
+            });
+        });
+    });
 });
