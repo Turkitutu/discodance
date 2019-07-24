@@ -7,7 +7,7 @@ class PhysicObject extends Emitter {
         super();
 
         if (options.fixedRotation) {
-            options.inertia = Infinity;   
+            options["inertia"] = Infinity;   
         }
 
         options.properties.push(options);
@@ -27,8 +27,8 @@ class PhysicObject extends Emitter {
         this._events = {};
     }
     static createColorSpot(options) {
-        options.isSensor = true;
-        options.isStatic = true;
+        options["isSensor"] = true;
+        options["isStatic"] = true;
         const obj = new this(options);
         obj.id = options.id;
         return obj

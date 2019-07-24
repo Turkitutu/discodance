@@ -11,9 +11,9 @@ module.exports = class Player extends PhysicObject {
                 scale: [0.3, 0.3]
             },
             properties: [0, 0, 30, 100],
-            frictionStatic: 1,
-            friction: 1,
-            frictionAir: 0.1,
+            'frictionStatic': 1,
+            'friction': 1,
+            'frictionAir': 0.1,
             fixedRotation: true
         });
         this.movement = [];

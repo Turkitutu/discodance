@@ -5,10 +5,12 @@ const Composite = Matter.Composite,
       FPMS = PIXI.settings.TARGET_FPMS;
 
 function emit(event) {
-    for (const pair of event.pairs) {
-        if (pair.bodyA.object && pair.bodyB.object) {
-            pair.bodyA.object.emit(event.name, pair.bodyB.object);
-            pair.bodyB.object.emit(event.name, pair.bodyA.object);
+    for (const pair of event["pairs"]) {
+        const bodyA = pair["bodyA"],
+              bodyB = pair["bodyB"];
+        if (bodyA.object && bodyB.object) {
+            bodyA.object.emit(event.name, bodyB.object);
+            bodyB.object.emit(event.name, bodyA.object);
         } 
     }
 }
@@ -16,7 +18,7 @@ function emit(event) {
 class GameWorld {
     constructor(options) {
         this.engine = Engine.create({
-            world: World.create(options)
+            'world': World.create(options)
         });
         Events.on(this.engine, "collisionStart", emit);
         Events.on(this.engine, "collisionActive", emit);

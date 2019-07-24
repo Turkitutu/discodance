@@ -10,6 +10,8 @@ module.exports = class Connection {
     connect(ip, port){
         this.ip = ip;
         this.port = port;
+        this.connected = true;
+        /*
         this.socket = new WebSocket("ws://"+ip+":"+port);
         this.socket.onerror = function(error) {
             console.error(error);
@@ -20,7 +22,7 @@ module.exports = class Connection {
 
         this.socket.onclose = function(){
             this.connected = false;
-            this.onclose();
+            //this.onclose();
         }
 
         this.socket.onmessage = function(event){
@@ -32,7 +34,7 @@ module.exports = class Connection {
                     this.incoming[cog][id](data);
                 }
             }
-        }
+        }*/
     }
 
     packet(incoming, cog, id, func){

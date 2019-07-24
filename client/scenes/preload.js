@@ -10,6 +10,8 @@ module.exports = class preload extends PIXI.Container {
         .add("bar_outer", "assets/bar_outer.png")
         .add("bar_inner", "assets/bar_inner.png")
         .load((loader, resources) => {
+            resources.bar_outer = resources["bar_outer"];
+            resources.bar_inner = resources["bar_inner"];
             const bar_outer = new PIXI.Sprite(resources.bar_outer.texture),
                   bar_inner = new PIXI.Sprite(resources.bar_inner.texture),
                   x = -bar_outer.width/2,
@@ -24,13 +26,17 @@ module.exports = class preload extends PIXI.Container {
             .add("character", "assets/character_ske.json")
             .add("character_info", "assets/character_tex.json")
             .add("character_tex", "assets/character_tex.png")
-            .add("logo_spalsh", "assets/spalsh.png")
+            .add("logo_splash", "assets/splash.png")
             .on("progress", loader => {
                 rect.width = loader.progress*bar_inner.texture.baseTexture.width/100;
                 bar_inner.texture.frame = rect;
                 bar_inner.texture = bar_inner.texture;
             })
             .load((loader, resources) => {
+                resources.character = resources["character"];
+                resources.character_info = resources["character_info"];
+                resources.character_tex = resources["character_tex"];
+                resources.logo_splash = resources["logo_splash"];
                 const factory = dragonBones.PixiFactory.factory;
                 factory.parseDragonBonesData(resources.character.data);
                 factory.parseTextureAtlasData(resources.character_info.data, resources.character_tex.texture);

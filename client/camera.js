@@ -20,7 +20,7 @@ module.exports = class Camera {
     }
     target(scene) {
         if (this._target) {
-            this._target.setParent(this.app.stage);
+            this.app.stage.addChild(this._target);
         }
         this._target = scene;
         this.container.addChild(scene);

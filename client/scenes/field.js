@@ -1,6 +1,8 @@
 const PhysicObject = require('../physics/object.js'),
       Player = require('../physics/player.js'),
-      fields = require('../utils/fields').map(name => require('../fields/'+name));
+      fields = [
+          require('../fields/Hollywood.js'),
+      ];
 
 class Field extends PIXI.Container {
     constructor() {

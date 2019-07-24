@@ -1,5 +1,5 @@
 const cogs = require('../utils/enums').cogs,
-      ByteArray = require('.../shared/bytearray.js');
+      ByteArray = require('../../shared/bytearray.js');
 
 module.exports = class login extends PIXI.Container {
     constructor() {
@@ -18,11 +18,11 @@ module.exports = class login extends PIXI.Container {
             }
         }
 
-        var logo = new PIXI.Sprite(resources.logo_spalsh.texture);
+        var logo = new PIXI.Sprite(resources.logo_splash.texture);
         logo.scale.set(2, 2);
         logo.position.set(-logo.width/2, -700);
         this.addChild(logo);
-
+        /*
         var nickname = new PIXI.TextInput(style);
         nickname.substituteText = false;
         nickname.x = -nickname.width/2;
@@ -43,8 +43,8 @@ module.exports = class login extends PIXI.Container {
         nickname.on('blur', () => {this.input.preventDefault = true});
         nickname.on('focus', () => {this.input.preventDefault = false});  
         password.on('blur', () => {this.input.preventDefault = true});
-        password.on('focus', () => {this.input.preventDefault = false}) ;   
-
+        password.on('focus', () => {this.input.preventDefault = false}) ;*/   
+        /*
         // Exemple
         this.connection.packet(false, cogs.login.id, cogs.login.login, function(name, pass){
             // do something
@@ -55,7 +55,7 @@ module.exports = class login extends PIXI.Container {
 
         this.connection.packet(true, cogs.login.id, cogs.login.result, function(data){
             // do something
-        });
+        });*/
 
     }
 
