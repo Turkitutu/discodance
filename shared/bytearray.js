@@ -6,6 +6,7 @@ class ByteArray {
         this.defaultSize = 1024;
         this.writeOffset = 0;
         this.readOffset = 0;
+        this.specialOffset = -1;
         this.currentBool = {
             readOffset : 0,
             writeOffset : 0,
@@ -21,9 +22,18 @@ class ByteArray {
     }
 
     writeBytes(int, length){
-        this.checkSize(length);
-        this.data.writeUIntBE(int, this.writeOffset, length);
-        this.writeOffset += length;
+        if (this.writeOffset <= this.specialOffset && this.specialOffset < this.writeOffset+length){
+            console.log('used')
+            this.checkSize(length+1);
+            for (var i = length-1; i >= 0; i--){
+                if (this.writeOffset == this.specialOffset) this.writeOffset++;
+                this.data.writeUInt8((int >> (8*i)) & 255, this.writeOffset++);
+            }
+        }else{
+            this.checkSize(length);
+            this.data.writeUIntBE(int, this.writeOffset, length);
+            this.writeOffset += length;
+        }
     }
 
     writeUInt(int) {
@@ -55,16 +65,27 @@ class ByteArray {
     }
 
     writeString(string){
-        var length = Buffer.byteLength(string, 'utf8');
-        this.writeUInt(length);
-        this.checkSize(length);
-        this.data.write(string, this.writeOffset);
-        this.writeOffset += length;
+        const str = Buffer.from(string);
+        this.writeUInt(str.length);
+        if (this.writeOffset <= this.specialOffset && this.specialOffset < this.writeOffset+str.length){
+            this.checkSize(str.length+1);
+            const n = this.specialOffset-this.writeOffset;
+            str.copy(this.data, this.writeOffset, 0, n);
+            this.writeOffset += n+1;
+            str.copy(this.data, this.writeOffset, n, str.length);
+            this.writeOffset += str.length-n;
+
+        }else{
+            this.checkSize(str.length);
+            this.data.write(string, this.writeOffset);
+            this.writeOffset += str.length;
+        }
         return this;
     }
 
     writeBoolean(bool) {
         if (this.currentBool.writeOffset !== this.writeOffset-1 || this.currentBool.writePos > 7) {
+            if (this.writeOffset == this.specialOffset) this.writeOffset++;
             this.currentBool.writeOffset = this.writeOffset++;
             this.currentBool.writePos = 0;
             this.checkSize(1);
@@ -74,8 +95,16 @@ class ByteArray {
     }
 
     readBytes(length){
-        const data = this.data.readUIntBE(this.readOffset, length);
-        this.readOffset += length;
+        var data = 0;
+        if (this.readOffset <= this.specialOffset && this.specialOffset < this.readOffset+length){
+            for (var i = length-1; i >= 0; i--){
+                if (this.readOffset == this.specialOffset) this.readOffset++;
+                data += this.data.readUInt8(this.readOffset++) << (8*i);
+            }
+        }else{
+            data = this.data.readUIntBE(this.readOffset, length);
+            this.readOffset += length;
+        }
         return data;
     }
 
@@ -110,14 +139,24 @@ class ByteArray {
     }
 
     readString(){
-        var length = this.readUInt()
-        var string = this.data.toString('utf8', this.readOffset, this.readOffset+length);
-        this.readOffset+=length;
+        const length = this.readUInt();
+        var string = "";
+        if (this.readOffset <= this.specialOffset && this.specialOffset < this.readOffset+length){
+            const n = this.specialOffset-this.readOffset;
+            string += this.data.toString('utf8', this.readOffset, this.readOffset+n);
+            this.readOffset += n + 1;
+            string += this.data.toString('utf8', this.readOffset, this.readOffset+length-n);
+            this.readOffset += length-n;
+        }else{
+            string = this.data.toString('utf8', this.readOffset, this.readOffset+length);
+            this.readOffset+=length;
+        }
         return string;
     }
 
     readBoolean() {
         if (this.currentBool.readOffset !== this.readOffset-1 || this.currentBool.readPos > 7) {
+            if (this.readOffset == this.specialOffset) this.readOffset++;
             this.currentBool.readOffset = this.readOffset++;
             this.currentBool.readPos = 0;
         }
@@ -138,7 +177,16 @@ class ByteArray {
         return this.writeOffset - this.readOffset;
     }
 
+    setSpciealByte(byte, pos){
+        this.data.writeUInt8(byte, pos);
+        this.spciealOffset = pos;
+        return this;
+    }
+
+    getSpciealByte(byte, pos){
+        return this.data.readUInt8(byte, pos);
+    }
+
 }
 
 module.exports = ByteArray;
-
