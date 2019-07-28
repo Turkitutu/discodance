@@ -1,4 +1,6 @@
 module.exports = {
+    incoming : true,
+    ingoing : false,
     cogs : {
         community_platform : {
             id : 1,

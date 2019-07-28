@@ -23,7 +23,6 @@ class ByteArray {
 
     writeBytes(int, length){
         if (this.writeOffset <= this.specialOffset && this.specialOffset < this.writeOffset+length){
-            console.log('used')
             this.checkSize(length+1);
             for (var i = length-1; i >= 0; i--){
                 if (this.writeOffset == this.specialOffset) this.writeOffset++;

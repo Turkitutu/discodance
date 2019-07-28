@@ -1,4 +1,4 @@
-const CogManager = require("./core/cog-manager");
+const ServerManager = require("./core/server-manager");
 
-const cogManager = new CogManager();
-cogManager.startServer();
+const serverManager = new ServerManager();
+serverManager.startServer();

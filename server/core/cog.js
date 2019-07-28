@@ -1,6 +1,7 @@
 class Cog {
-    constructor(name) {
+    constructor(name, player) {
         this.name = name;
+        this.player = player;
         this.incoming = require("../"+name+"/incoming");
         this.outgoing = require("../"+name+"/outgoing");
     }

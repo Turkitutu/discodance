@@ -2,7 +2,7 @@ const webpack = require('webpack'),
       path = require('path'),
       fs = require('fs'),
       TerserPlugin = require('terser-webpack-plugin'),
-      Terser = require("terser");
+      Terser = require("terser"),
       babel = require("@babel/core");
 
 require('dotenv').config();

@@ -1,8 +1,9 @@
 const Cog = require("../core/cog");
 
 class Community extends Cog {
-    constructor(name) {
+    constructor(name, player) {
         super(name);
+        super(player);
     }
     send_room_message(packet) {
         //this is a recieved packet;
