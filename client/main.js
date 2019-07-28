@@ -1,3 +1,7 @@
+window.PIXI = require('../libs/pixi.js');
+window.Matter = require('../libs/matter.js');
+window.dragonBones = require('../libs/dragonbones.js');
+
 const SceneManager = require('./scene-manager.js'),
       Camera = require('./camera.js'),
       Keyboard = require('./keyboard.js'),
@@ -5,7 +9,7 @@ const SceneManager = require('./scene-manager.js'),
       Connection = require("./connection.js"),
       keysDefault = require('./utils/keys-default.js');
 
-const app = new PIXI.$Application({
+const app = new PIXI.Application({
     $width: window.$innerWidth,
     $height: window.$innerHeight,
     $autoResize: true,
@@ -18,8 +22,8 @@ Camera.handleResize(app);
 
 window.$onload = () => {
     document.$body.$style.$overflow = 'hidden'
-    app.$renderer.$view.$style.$position = 'absolute';
-    app.$view.$style.$display = 'block';
+    app.view.$style.$position = 'absolute';
+    app.view.$style.$display = 'block';
     document.$body.$appendChild(app.$view);
 }
 
@@ -42,7 +46,7 @@ const sceneManager = new SceneManager(app, connection, world, camera, keyboard);
 
 sceneManager.play('preload');
 
-app.$ticker.$add(delta => {
+app.ticker.add(delta => {
     sceneManager.update(delta);
     camera.update();
     //last thing

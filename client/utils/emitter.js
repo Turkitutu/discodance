@@ -6,14 +6,14 @@ class Emitter {
         if (!this._events[eventName]) {
             this._events[eventName] = [cb];
         } else {
-            this._events[eventName].$push(cb);
+            this._events[eventName].push(cb);
         }
         return this;
     }
     off(eventName, cb) {
         if (this._events[eventName]) {
-            const index = this._events[eventName].$indexOf(cb);
-            if (index !== -1) this._events[eventName].$slice(index, 1);
+            const index = this._events[eventName].indexOf(cb);
+            if (index !== -1) this._events[eventName].slice(index, 1);
         }
         return this;
     }

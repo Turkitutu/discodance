@@ -1,13 +1,13 @@
 const cogs = require('../utils/enums.js').cogs;
 
-module.exports = class login extends PIXI.$Container {
+module.exports = class login extends PIXI.Container {
     constructor() {
         super();
         this.name = 'login';
     }
 
     play() {
-        const resources = PIXI.$loaders.$shared.$resources;
+        const resources = PIXI.loaders.shared.resources;
         var style = {
             input: {fontSize: '16px', fontFamily: 'Tahoma', color: '#ffffff', textAlign: 'center'}, 
             box: {
@@ -17,10 +17,10 @@ module.exports = class login extends PIXI.$Container {
             }
         }
 
-        var logo = new PIXI.$Sprite(resources.$logo_splash.$texture);
-        logo.$scale.$set(2, 2);
-        logo.$position.$set(-logo.$width/2, -700);
-        this.$addChild(logo);
+        var logo = new PIXI.Sprite(resources.$logo_splash.$texture);
+        logo.$scale.set(2, 2);
+        logo.$position.set(-logo.$width/2, -700);
+        this.addChild(logo);
 
     }
 
