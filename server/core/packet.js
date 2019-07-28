@@ -1,10 +1,9 @@
 const ByteArray = require("../../shared/bytearray.js");
 
 class Packet {
-    constructor(message, ws) {
-        this.socket = ws;
+    constructor(message, player) {
+        this.player = player;
         this.read(message);
-        //this.cogId, this.socket (ws), this.data (byteArray from message);
     }
     setData(byteArray) {
         this.data = byteArray;
@@ -25,9 +24,11 @@ class Packet {
         this.cogId = this.data.readUInt();
     }
     send() {
-        this.socket.send(this.data);
+        this.player.socket.send(this.data);
     }
     broadcast() {
-        //for each client: client.send(this.data);
+        for (const player of this.player.server.players) {
+            player.socket.send(this.data);
+        }
     }
 }
