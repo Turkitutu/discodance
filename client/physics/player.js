@@ -5,7 +5,7 @@ module.exports = class Player extends PhysicObject {
         super({
             shape: 'rectangle',
             sprite: {
-                object: dragonBones.$PixiFactory.$factory.$buildArmatureDisplay('body', 'character'),
+                object: dragonBones.PixiFactory.factory.buildArmatureDisplay('body', 'character'),
                 size: [30, 100],
                 anchor: [0, 0.5],
                 scale: [0.3, 0.3]
@@ -28,7 +28,7 @@ module.exports = class Player extends PhysicObject {
     set state(value) {
         if (this._state !== value && this.can(value)) {
             this._state = value;
-            this.sprite.$animation.$fadeIn(value, 0.05);
+            this.sprite.$animation.fadeIn(value, 0.05);
         }
     }
     can(state) {
@@ -43,7 +43,7 @@ module.exports = class Player extends PhysicObject {
         if (this.movement[0] || this.movement[1]) {
             const factor = this.movement[0] ? 1 : -1;
             this.state = 'run';
-            this.sprite.$scale.$x = -Math.$abs(this.sprite.$scale.$x)*factor;
+            this.sprite.$scale.$x = -Math.abs(this.sprite.$scale.$x)*factor;
             this.setVelocity(this.speed*factor);
         } else {
             this.state = 'breath';

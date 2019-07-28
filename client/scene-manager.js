@@ -1,4 +1,4 @@
-const Container = PIXI.$Container;
+const Container = PIXI.Container;
 const ByteArray = require('../shared/bytearray.js')
 
 class SceneManager {
@@ -12,14 +12,14 @@ class SceneManager {
         Container.prototype.world = world;
         Container.prototype.scenes = this;
         const req = require.context('./scenes', false, /\.js$/);
-        for (const filename of req.$keys()) {
+        for (const filename of req.keys()) {
             const Scene = req(filename),
                   scene = new Scene();
             scene.$visible = false;
             this.get[scene.name] = scene;
-            this.sceneList.$push(scene);
+            this.sceneList.push(scene);
             scene.scenes = this;
-            app.$stage.$addChild(scene);
+            app.$stage.addChild(scene);
         }
     }
     disable() {

@@ -38,7 +38,7 @@ class Keyboard {
         }
     }
     batchRegister(keys) {
-        for (const key of Object.$keys(keys)) {
+        for (const key of Object.keys(keys)) {
             keys[key].ref = key;
             this.registerKey(keys[key]);
         }

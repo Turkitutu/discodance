@@ -3,11 +3,11 @@ module.exports = class Camera {
         this.app = app;
         this.speed = speed || 0.1; //interval [0, 1]
         this.tolerance = tolerance || 1;
-        this.container = new PIXI.$Container();
-        app.$stage.$addChild(this.container);
-        this.container.$position.$set(app.width/2, app.height/2);
-        this.bounds = new PIXI.$Point(Infinity, Infinity);
-        this._barycenter = new PIXI.$Point();
+        this.container = new PIXI.Container();
+        app.$stage.addChild(this.container);
+        this.container.$position.set(app.width/2, app.height/2);
+        this.bounds = new PIXI.Point(Infinity, Infinity);
+        this._barycenter = new PIXI.Point();
     }
     reset() {
         this._focus = null;
@@ -20,10 +20,10 @@ module.exports = class Camera {
     }
     target(scene) {
         if (this._target) {
-            this.app.$stage.$addChild(this._target);
+            this.app.$stage.addChild(this._target);
         }
         this._target = scene;
-        this.container.$addChild(scene);
+        this.container.addChild(scene);
         this.reset();
     }
     focus(children) {
@@ -31,17 +31,17 @@ module.exports = class Camera {
     }
     zoom(scale) {
         this._scale = scale;
-        this.container.$scale.$set(scale, scale);
+        this.container.$scale.set(scale, scale);
     }
     teleport(x, y) {
-        this._target.$position.$set(-x, -y);
+        this._target.$position.set(-x, -y);
     }
     translate(x, y) {
         this._target.$position.$x -= x;
         this._target.$position.$y -= y;
     }
     barycenter() {
-        this._barycenter.$set(0, 0);
+        this._barycenter.set(0, 0);
         let length = 0;
         for (const obj of this._focus) {
             length++;
@@ -57,14 +57,14 @@ module.exports = class Camera {
             const bc = this.barycenter(),
                   posX = bc.$x+this._target.$position.$x,
                   posY = bc.$y+this._target.$position.$y;
-            this.translate(Math.$abs(posX) > this.tolerance ? posX*this.speed : posX, Math.$abs(posY) > this.tolerance ? posY*this.speed : posY);
+            this.translate(Math.abs(posX) > this.tolerance ? posX*this.speed : posX, Math.abs(posY) > this.tolerance ? posY*this.speed : posY);
             let dx = 0, dy = 0;
             for (const target of this._focus) {
-                dx = Math.$max(dx, Math.$abs(bc.$x-target.body.$position.$x)+target.size[0]/2);
-                dy = Math.$max(dy, Math.$abs(bc.$y-target.body.$position.$y)+target.size[1]/2);
+                dx = Math.max(dx, Math.abs(bc.$x-target.body.$position.$x)+target.size[0]/2);
+                dy = Math.max(dy, Math.abs(bc.$y-target.body.$position.$y)+target.size[1]/2);
             }
             const zoom = dx/this.app.fullRatio > dy ? this.app.fullWidth*this._scale/(dx*2) : this.app.fullHeight*this._scale/(dy*2);
-            this.container.$scale.$set(zoom, zoom);
+            this.container.$scale.set(zoom, zoom);
         }
     }
     static handleResize(app) {
@@ -77,17 +77,17 @@ module.exports = class Camera {
             app.$renderer.$resize(width, height);
             app.fullRatio = width/height;
             if (height >= baseHeight) {
-                position.$set(0, (height-baseHeight)/2);
+                position.set(0, (height-baseHeight)/2);
                 scale = width/app.width;
                 app.fullWidth = app.width;
                 app.fullHeight = app.width/app.fullRatio;
             } else {
-                position.$set((width-height*app.ratio)/2, 0);
+                position.set((width-height*app.ratio)/2, 0);
                 scale = height/app.height;
                 app.fullWidth = app.height*app.fullRatio;
                 app.fullHeight = app.height;
             }
-            app.$stage.$scale.$set(scale, scale);
+            app.$stage.$scale.set(scale, scale);
         }
 
         app.ratio = app.width/app.height;

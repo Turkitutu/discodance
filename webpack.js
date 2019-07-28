@@ -2,12 +2,14 @@ const webpack = require('webpack'),
       path = require('path'),
       fs = require('fs'),
       TerserPlugin = require('terser-webpack-plugin'),
-      Terser = require("terser");
+      Terser = require("terser"),
       babel = require("@babel/core");
 
 require('dotenv').config();
 
-var reserved = [];
+var mustInclude = ['Ticker', 'ObservablePoint', 'Loader', 'BaseFactory', 'Animation']; 
+
+var reserved = []; //property names that must not be changed during the minifying process;
 var filtered = ['name'];
 
 function add(name) {
@@ -27,7 +29,7 @@ function add(name) {
 
 reserved = reserved.filter((name, i) => filtered.indexOf(name) === -1 && reserved.indexOf(name) === i && !name.startsWith('$'));
 
-reserved.forEach(x => console.log(x));
+//reserved.forEach(x => console.log(x));
 
 var config = {
     mode: "production",
@@ -41,6 +43,9 @@ var config = {
             new TerserPlugin({
                 terserOptions: {
                     ecma: 8,
+                    compress: {
+                        properties: false
+                    },
                     mangle: {
                         reserved: [],
                         toplevel: true,
@@ -55,6 +60,57 @@ var config = {
         ]
     }
 };
+
+var walkSync = function(dir, filelist) {
+    var fs = fs || require('fs'),
+        files = fs.readdirSync(dir);
+    filelist = filelist || [];
+    files.forEach(function(file) {
+        if (fs.statSync(dir + file).isDirectory()) {
+            filelist = walkSync(dir + file + '/', filelist);
+        } else {
+            filelist.push(dir + file);
+        }
+    });
+    return filelist;
+};
+
+function generate() {
+    const filelist = walkSync('./client/');
+    const loaded = {};
+    const check = f => {
+        for (let file of filelist) {
+            file = loaded[file] || (loaded[file]=fs.readFileSync(file));
+            if (mustInclude.includes(f) || file.includes(f)) return true;
+        }
+    }
+    const toProperty = name => name.replace(/^\$/,'').match(/^[$_a-zA-Z][$\w]*$/) ? '.'+name : '['+JSON.stringify(name)+']';
+    const stringify = (str, obj) => {
+        if (!obj) return;
+        for (const child of obj) {
+            if (check(child.name)) {
+                str.push(
+                    child.descriptor
+                    ? `Object.defineProperty(${child.parentName}, ${JSON.stringify(child.name)}, Object.getOwnPropertyDescriptor(${child.parentName}, ${JSON.stringify(child.name)}));`
+                    : `${child.parentName}${toProperty(child.name)} = ${child.parentName}${toProperty('$'+child.name)};`
+                );
+                stringify(str, child.children);
+            }
+        } 
+    }
+    const refs = walkSync('./libs/').filter(name => name.match(/\.ref/));
+    for (const filename of refs) {
+        const lib = JSON.parse(fs.readFileSync(filename));
+        let str = [`const ${lib.name} = ${lib.parentName};`];
+        stringify(str, lib.children);
+        str.push(`module.exports = ${lib.name};`);
+        fs.writeFileSync(filename.replace('.ref', ''), str.join('\n'));
+    }
+}
+
+if (process.argv.includes('--generate', 2)) {
+    generate();
+}
 
 var babelOptions = {
     presets: ["@babel/preset-env"]
