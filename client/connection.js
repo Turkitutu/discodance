@@ -76,7 +76,6 @@ module.exports = class Connection {
                         //this is the default send function
                         packet.setSpecialByte(id, 1);
                     }
-                    console.$log(packet.writeBuf(data.buffer).buffer.toString());
                     this.socket.$send(packet.writeBuf(data.buffer).buffer);
                 }
             }

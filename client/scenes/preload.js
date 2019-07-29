@@ -48,7 +48,6 @@ module.exports = class preload extends PIXI.Container {
 
             this.connection.use(false, cogs.login.id, (id, packet) => {
                 packet.setSpecialByte(id, 3);
-                console.$log(packet.buffer)
             });
 
             this.connection.packet(false, cogs.login.id, cogs.login.handshake, () => {
@@ -63,14 +62,13 @@ module.exports = class preload extends PIXI.Container {
 
             this.connection.onopen = () => {
                 this.connection.send(cogs.login.id, cogs.login.handshake);
-                this.connection.send(cogs.login.id, cogs.login.handshake);
             }
         });
     }
     update() {
         if (this.loaded && this.connection.connected) {
-            //this.scenes.play('login');
-            //this.disable();
+            this.scenes.play('login');
+            this.disable();
         }
     }
 }
