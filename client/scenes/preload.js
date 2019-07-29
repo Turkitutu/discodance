@@ -1,3 +1,7 @@
+const cogs = require('../utils/enums.js').cogs;
+const ByteArray = require('../../shared/bytearray.js')
+
+
 module.exports = class preload extends PIXI.Container {
     constructor() {
         super();
@@ -34,15 +38,39 @@ module.exports = class preload extends PIXI.Container {
                 const factory = dragonBones.PixiFactory.factory;
                 factory.parseDragonBonesData(resources.$character.$data);
                 factory.parseTextureAtlasData(resources.$character_info.$data, resources.$character_tex.$texture);
+                this.connection.connect("localhost", 1661);
+                const text = new PIXI.Text('Connecting to server ...',{fontFamily : 'Tahoma', fontSize: 24, fill : 0xffffff, align : 'center'});
+                text.$position.set(-text.$width/2, 100);
+                this.addChild(text);
+                this.connection.connect("localhost", 1661);
                 this.loaded = true;
             });
-            this.connection.connect("localhost", 1661);
+
+            this.connection.use(false, cogs.login.id, (id, packet) => {
+                packet.setSpecialByte(id, 3);
+                console.$log(packet.buffer)
+            });
+
+            this.connection.packet(false, cogs.login.id, cogs.login.handshake, () => {
+                let p = new ByteArray();
+                p.writeUInt(1); // version
+                p.writeString('&token&'); // TODO: make token system
+                p.writeString(navigator.$userAgent); // navigator data
+                p.writeString(navigator.$language); // like : fr-TN
+                p.writeString(navigator.$platform); // like : win32
+                return p;
+            });
+
+            this.connection.onopen = () => {
+                this.connection.send(cogs.login.id, cogs.login.handshake);
+                this.connection.send(cogs.login.id, cogs.login.handshake);
+            }
         });
     }
     update() {
         if (this.loaded && this.connection.connected) {
-            this.scenes.play('login');
-            this.disable();
+            //this.scenes.play('login');
+            //this.disable();
         }
     }
 }

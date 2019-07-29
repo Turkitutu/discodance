@@ -17,9 +17,14 @@ class ServerManager {
 			const player = new Player(this, ws, req);
 			this.players.push(player);
 			ws.on("message", message => {
+				//console.log("Data from "+player.ipAddress+" : "+message); // Just for test
 				const packet = new Packet(message, player),
 		              cog = this.cogs[packet.cogId];
-		        cog[cog.read(packet)](packet);
+		        if (cog) {
+		        	cog[cog.read(packet)](packet);
+		        } else {
+		        	console.log('New cog : ['+packet.cogId+'] '+packet.data.buffer);
+		        }
 		        //cog.read(packet) is packetName;
 		        //Example: if the packet name is "get_room_message" and the cog is Community
 		       	//the code becomes:

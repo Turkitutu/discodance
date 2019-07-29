@@ -12,12 +12,14 @@ module.exports = class Connection {
         this.port = port;
 
         this.socket = new WebSocket("ws://"+ip+":"+port);
-        this.socket.$onerror = (error) => {
-            console.$error(error);
+
+        this.socket.$onopen = (event) => {
+            this.onopen();
+            this.connected = true;
         };
 
-        this.socket.$onopen = () => {
-            this.connected = true;
+        this.socket.$onerror = (error) => {
+            console.$error(error);
         };
 
         this.socket.$onclose = () => {
@@ -43,40 +45,47 @@ module.exports = class Connection {
 
     use(incoming, cog, func){
         if (incoming){
-            if (!this.incoming[id]) this.incoming[id] = {};
+            if (!this.incoming[cog]) this.incoming[cog] = {packets : {}};
             this.incoming[id].special = func;
         }else{
-            if (!this.outgoing[id]) this.outgoing[id] = {};
-            this.outgoing[id].special = func;
+            if (!this.outgoing[cog]) this.outgoing[cog] = {packets : {}};
+            this.outgoing[cog].special = func;
         }
     }
 
     packet(incoming, cog, id, func){
         if (incoming){
-            if (!this.incoming[id]) this.incoming[id] = {packets : {}};
+            if (!this.incoming[cog]) this.incoming[cog] = {packets : {}};
             this.incoming[cog].packets[id] = func;
         } else {
-            if (!this.outgoing[id]) this.outgoing[id] = {packets : {}};
+            if (!this.outgoing[cog]) this.outgoing[cog] = {packets : {}};
             this.outgoing[cog].packets[id] = func;
         }
     }
 
     send(cog, id, ...args){
         if (this.outgoing[cog]){
-            if (this.outgoing[cog][id]){
-                const data = this.outgoing[cog].packets[id](...args);
-                const packet = new ByteArray()
-                if (this.outgoing[cog].special){
-                    packet = this.outgoing[cog].special();
-                }else{
-                    packet = new ByteArray().writeUInt(cog).writeUInt(id);
+            if (this.outgoing[cog].packets){
+                if (this.outgoing[cog].packets[id]){
+                    const data = this.outgoing[cog].packets[id](...args);
+                    const packet = new ByteArray()
+                    packet.writeUInt(cog);
+                    if (this.outgoing[cog].special){
+                        this.outgoing[cog].special(id, packet);
+                    }else{
+                        //this is the default send function
+                        packet.setSpecialByte(id, 1);
+                    }
+                    console.$log(packet.writeBuf(data.buffer).buffer.toString());
+                    this.socket.$send(packet.writeBuf(data.buffer).buffer);
                 }
-                this.socket.$send(packet.buffer + data.$buffer);
             }
         }
     }
 
     onclose(){
+    }
+    onopen(){
     }
 
 }

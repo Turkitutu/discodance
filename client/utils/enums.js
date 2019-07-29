@@ -3,14 +3,12 @@ module.exports = {
     outgoing : false,
     cogs : {
         community_platform : {
-            id : 1,
+            id : 0,
             send_room_message : 1
         },
         login : {
-            id : 2,
-            login : 1,
-            result : 2,
-            create_account : 3
+            id : 1,
+            handshake : 1,
         }
     }
 }

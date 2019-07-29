@@ -32,3 +32,5 @@ class Packet {
         }
     }
 }
+
+module.exports = Packet;

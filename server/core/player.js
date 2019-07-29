@@ -1,6 +1,3 @@
-const Packet = require("./packet.js"),
-      cogList = require("../utils/cogs");
-
 class Player {
     constructor(server, ws, req) {
         this.server = server;

@@ -169,7 +169,7 @@ class ByteArray {
     }
 
     get buffer() {
-        return this.data.slice(0, this.writeOffset);
+        return this.data.slice(0, this.specialOffset < this.writeOffset ? this.writeOffset : this.specialOffset+1);
     }
 
     get bytesAvailable() {
@@ -178,12 +178,28 @@ class ByteArray {
 
     setSpecialByte(byte, pos){
         this.data.writeUInt8(byte, pos);
-        this.spciealOffset = pos;
+        this.specialOffset = pos;
         return this;
     }
 
     getSpecialByte(pos){
         return this.data.readUInt8(this.specialOffset=(pos || this.specialOffset));
+    }
+
+    writeBuf(buf){
+        if (this.writeOffset <= this.specialOffset && this.specialOffset < this.writeOffset+buf.length){
+            this.checkSize(buf.length+1);
+            const n = this.specialOffset-this.writeOffset;
+            buf.copy(this.data, this.writeOffset, 0, n);
+            this.writeOffset += n+1;
+            buf.copy(this.data, this.writeOffset, n, buf.length);
+            this.writeOffset += buf.length-n;
+        }else{
+            this.checkSize(buf.length);
+            buf.copy(this.data, this.writeOffset, 0, buf.length);
+            this.writeOffset += buf.length;
+        }
+        return this;
     }
 
 }
