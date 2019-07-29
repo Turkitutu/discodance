@@ -4,7 +4,7 @@ module.exports = class Connection {
     constructor() {
         this.connected = false;
         this.incoming = {};
-        this.ingoing = {};
+        this.outgoing = {};
     }
 
     connect(ip, port){
@@ -46,8 +46,8 @@ module.exports = class Connection {
             if (!this.incoming[id]) this.incoming[id] = {};
             this.incoming[id].special = func;
         }else{
-            if (!this.ingoing[id]) this.ingoing[id] = {};
-            this.ingoing[id].special = func;
+            if (!this.outgoing[id]) this.outgoing[id] = {};
+            this.outgoing[id].special = func;
         }
     }
 
@@ -56,18 +56,18 @@ module.exports = class Connection {
             if (!this.incoming[id]) this.incoming[id] = {packets : {}};
             this.incoming[cog].packets[id] = func;
         } else {
-            if (!this.ingoing[id]) this.incoming[id] = {packets : {}};
-            this.ingoing[cog].packets[id] = func;
+            if (!this.outgoing[id]) this.outgoing[id] = {packets : {}};
+            this.outgoing[cog].packets[id] = func;
         }
     }
 
     send(cog, id, ...args){
-        if (this.ingoing[cog]){
-            if (this.ingoing[cog][id]){
-                const data = this.ingoing[cog].packets[id](...args);
+        if (this.outgoing[cog]){
+            if (this.outgoing[cog][id]){
+                const data = this.outgoing[cog].packets[id](...args);
                 const packet = new ByteArray()
-                if (this.ingoing[cog].special){
-                    packet = this.ingoing[cog].special();
+                if (this.outgoing[cog].special){
+                    packet = this.outgoing[cog].special();
                 }else{
                     packet = new ByteArray().writeUInt(cog).writeUInt(id);
                 }

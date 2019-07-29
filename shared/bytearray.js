@@ -176,14 +176,14 @@ class ByteArray {
         return this.writeOffset - this.readOffset;
     }
 
-    setSpciealByte(byte, pos){
+    setSpecialByte(byte, pos){
         this.data.writeUInt8(byte, pos);
         this.spciealOffset = pos;
         return this;
     }
 
-    getSpciealByte(byte, pos){
-        return this.data.readUInt8(byte, pos);
+    getSpecialByte(pos){
+        return this.data.readUInt8(this.specialOffset=(pos || this.specialOffset));
     }
 
 }
