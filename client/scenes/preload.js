@@ -42,7 +42,6 @@ module.exports = class preload extends PIXI.Container {
                 const text = new PIXI.Text('Connecting to server ...',{fontFamily : 'Tahoma', fontSize: 24, fill : 0xffffff, align : 'center'});
                 text.$position.set(-text.$width/2, 100);
                 this.addChild(text);
-                this.connection.connect("localhost", 1661);
                 this.loaded = true;
             });
 
@@ -67,8 +66,8 @@ module.exports = class preload extends PIXI.Container {
     }
     update() {
         if (this.loaded && this.connection.connected) {
-            this.scenes.play('login');
-            this.disable();
+            //this.scenes.play('login');
+            //this.disable();
         }
     }
 }
