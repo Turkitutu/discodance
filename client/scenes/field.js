@@ -17,6 +17,7 @@ class Field extends PIXI.Container {
         this.spawnOffset = 0;
     }
     play() {
+        this.scenes.play('interface', true);
         this.field = fields[this.world.fieldId];
         PhysicObject.colorTarget = this.playerList;
         PIXI.loaders.shared

@@ -1,3 +1,4 @@
+require('../libs/others.js');
 window.PIXI = require('../libs/pixi.js');
 window.Matter = require('../libs/matter.js');
 window.dragonBones = require('../libs/dragonbones.js');

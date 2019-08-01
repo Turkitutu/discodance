@@ -10,7 +10,7 @@ require('dotenv').config();
 var mustInclude = ['Ticker', 'ObservablePoint', 'Loader', 'BaseFactory', 'Animation']; 
 
 var reserved = []; //property names that must not be changed during the minifying process;
-var filtered = ['name'];
+var filtered = ['name', 'set'];
 
 function add(name) {
     reserved.push(name);
@@ -18,7 +18,8 @@ function add(name) {
 
 [ 
     Object, Array, Function,
-    String, Math, Date
+    String, Math, Date, 
+    ArrayBuffer, Uint8Array.__proto__.prototype
 
 ].forEach(function(ctor) {
     Object.getOwnPropertyNames(ctor).map(add);
@@ -58,7 +59,8 @@ var config = {
                 }
             })
         ]
-    }
+    },
+    node: false
 };
 
 var walkSync = function(dir, filelist) {

@@ -13,12 +13,20 @@ class ByteArray {
             readPos : 0,
             writePos : 0
         }
-        if (buf !== undefined) {
+        if (buf instanceof Buffer) {
+            this.data = buf;
+            this.writeOffset = buf.length;
+        } else if (buf !== undefined) {
             this.data = Buffer.from(buf);
             this.writeOffset = this.data.length;
         } else {
-            this.data = Buffer.alloc(this.defaultSize);
+            this._buffer = Buffer.alloc(this.defaultSize);
+            this.data = this._buffer.slice(4);
         }
+    }
+
+    subbuffer(offset, length) {
+        return this.data.slice(this.readOffset, this.readOffset=offset+length);
     }
 
     writeBytes(int, length){
@@ -139,18 +147,15 @@ class ByteArray {
 
     readString(){
         const length = this.readUInt();
-        var string = "";
+        var string;
         if (this.readOffset <= this.specialOffset && this.specialOffset < this.readOffset+length){
             const n = this.specialOffset-this.readOffset;
-            string += this.data.toString('utf8', this.readOffset, this.readOffset+n);
-            this.readOffset += n + 1;
-            string += this.data.toString('utf8', this.readOffset, this.readOffset+length-n);
-            this.readOffset += length-n;
+            string = this.data.toString('utf8', this.readOffset, this.readOffset+n)
+                   + this.data.toString('utf8', this.readOffset+n+1, this.readOffset+=(length+1));
         }else{
-            string = this.data.toString('utf8', this.readOffset, this.readOffset+length);
-            this.readOffset+=length;
+            string = this.data.toString('utf8', this.readOffset, this.readOffset+=length);
         }
-        return string;
+        return [string, length];
     }
 
     readBoolean() {
@@ -164,12 +169,19 @@ class ByteArray {
 
     checkSize(length) {
         if (this.writeOffset+length > this.data.length){
-            this.data = Buffer.concat(this.data, Buffer.alloc(this.defaultSize))
+            this._buffer = Buffer.concat([this._buffer, Buffer.alloc(this.defaultSize)]);
+            this.data = this._buffer.slice(4);
         }
     }
 
     get buffer() {
-        return this.data.slice(0, this.specialOffset < this.writeOffset ? this.writeOffset : this.specialOffset+1);
+        const length = Math.max(this.writeOffset, this.specialOffset+1) + 1,
+              offset = 4-this.constructor.UIntLength(length);
+        this.data = this._buffer;
+        this.writeOffset = offset;
+        this.specialOffset = -1;
+        this.writeUInt(length);
+        return this._buffer.buffer.slice(offset, offset+length);
     }
 
     get bytesAvailable() {
@@ -200,6 +212,18 @@ class ByteArray {
             this.writeOffset += buf.length;
         }
         return this;
+    }
+
+    static UIntLength(int) {
+        if (int < 64) {
+            return 1;
+        } else if (int < 16384) {
+            return 2;
+        } else if (int < 4194304) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 
 }

@@ -2,11 +2,12 @@ module.exports = {
     incoming : true,
     outgoing : false,
     cogs : {
-        community_platform : {
+        community : {
             id : 0,
-            send_room_message : 1
+            on_room_message: 0,
+            send_room_message : 0
         },
-        login : {
+        authentication : {
             id : 1,
             handshake : 1,
         }

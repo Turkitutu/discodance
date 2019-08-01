@@ -1,4 +1,4 @@
-const cogs = require('../utils/enums.js').cogs;
+const {incoming, outgoing, cogs} = require('../utils/enums.js');
 const ByteArray = require('../../shared/bytearray.js')
 
 
@@ -7,6 +7,22 @@ module.exports = class preload extends PIXI.Container {
         super();
         this.name = 'preload';
         this.loaded = false;
+
+        this.connection.use(outgoing, cogs.authentication.id, (id, packet) => {
+            packet.setSpecialByte(id, 3);
+        });
+
+        this.connection.packet(outgoing, cogs.authentication.id, cogs.authentication.handshake, packet => {
+            packet.writeUInt(1); // version
+            packet.writeString('&token&'); // TODO: make token system
+            packet.writeString(navigator.$userAgent); // navigator data
+            packet.writeString(navigator.$language); // like : fr-TN
+            packet.writeString(navigator.$platform); // like : win32
+        });
+
+        this.connection.onopen = () => {
+            this.connection.send(cogs.authentication.id, cogs.authentication.handshake);
+        }
     }
     play() {
         let loader = PIXI.loaders.shared;
@@ -44,30 +60,12 @@ module.exports = class preload extends PIXI.Container {
                 this.addChild(text);
                 this.loaded = true;
             });
-
-            this.connection.use(false, cogs.login.id, (id, packet) => {
-                packet.setSpecialByte(id, 3);
-            });
-
-            this.connection.packet(false, cogs.login.id, cogs.login.handshake, () => {
-                let p = new ByteArray();
-                p.writeUInt(1); // version
-                p.writeString('&token&'); // TODO: make token system
-                p.writeString(navigator.$userAgent); // navigator data
-                p.writeString(navigator.$language); // like : fr-TN
-                p.writeString(navigator.$platform); // like : win32
-                return p;
-            });
-
-            this.connection.onopen = () => {
-                this.connection.send(cogs.login.id, cogs.login.handshake);
-            }
         });
     }
     update() {
         if (this.loaded && this.connection.connected) {
-            //this.scenes.play('login');
-            //this.disable();
+            this.scenes.play('login');
+            this.disable();
         }
     }
 }

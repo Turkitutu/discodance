@@ -1,0 +1,1 @@
+Uint8Array.prototype.set = Uint8Array.prototype.$set;

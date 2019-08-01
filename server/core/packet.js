@@ -14,8 +14,8 @@ class Packet {
         this.writeCog();
     }
     writeCog() {
-        const offset = this.data.writeOffset || 1;
-        this.data.writeOffset = 0;
+        const offset = this.data.writeOffset || 2;
+        this.data.writeOffset = 1;
         this.data.writeUInt(this.cogId);
         this.data.writeOffset = offset;
     }
@@ -24,11 +24,21 @@ class Packet {
         this.cogId = this.data.readUInt();
     }
     send() {
-        this.player.socket.send(this.data);
+        this.player.socket.send(this.data.buffer);
     }
-    broadcast() {
-        for (const player of this.player.server.players) {
-            player.socket.send(this.data);
+    broadcast(type) {
+        const buffer = this.data.buffer;
+        switch (type) {
+            case 'ALL': 
+                for (const player of this.player.server.players) {
+                    player.socket.send(buffer);
+                }
+                break;
+            case 'ROOM':
+                for (const player of this.player.room.players) {
+                    player.socket.send(buffer);
+                }
+                break;
         }
     }
 }
