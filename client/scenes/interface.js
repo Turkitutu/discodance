@@ -1,9 +1,9 @@
-const { incoming, outgoing, cogs: { community } } = require('../utils/enums.js');
+const Scene = require('../core/scene.js'),
+      { incoming, outgoing, cogs: { community } } = require('../utils/enums.js');
 
-class Interface extends PIXI.Container {
+class Interface extends Scene {
     constructor() {
         super();
-        this.name = 'interface';
 
         this.connection.use(outgoing, community.id, (id, packet) => {
             packet.setSpecialByte(id, 3);
@@ -22,6 +22,7 @@ class Interface extends PIXI.Container {
     }
     play() {
 
+        this.enable();
     }
 }
 

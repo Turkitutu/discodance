@@ -11,20 +11,25 @@
 textarea:focus, input:focus, button:focus, select:focus {
     outline: none;
 }
-
+button {
+	border-bottom: 0.90px solid rgba(0, 0, 0, 0.70);border-top: 0.90px solid rgba(255, 255, 255, 0.70);
+}
+button:focus {
+	border-top: 0.90px solid rgba(0, 0, 0, 0.70);border-bottom: 0.90px solid rgba(255, 255, 255, 1);}
+}
 
 /** Components **/
 .uiWindow {
 	margin-top: 24px;
 }
+
 .uiWindow .head {
 	left: 0;
 	top: -2em;
 	position: absolute;
 	text-align: center;
 	color: #f9feff;
-	text-shadow: 1px 1px rgba(0, 0, 0, 0.50);
-	background: #00bcd4;
+	background: #1c2a31;
     line-height: 40px;
     width: 100%;
     height: 40px;
@@ -40,7 +45,7 @@ textarea:focus, input:focus, button:focus, select:focus {
 	font-weight: 900;
 }
 .uiWindow.bg {
-	background: #80DEEA;
+	background: #29343a;
 	padding: 15px;
 	border-radius: 0 0 5px 5px;
 	-moz-border-radius: 0 0 5px 5px;
@@ -48,6 +53,7 @@ textarea:focus, input:focus, button:focus, select:focus {
 	-ms-border-radius: 0 0 5px 5px;
 	-webkit-border-radius: 0 0 5px 5px;
 	font-family: Tahoma;
+	color: rgba(0, 0, 0, 0.80);
 }
 .uiWindow .close {
 	cursor: pointer;
@@ -55,15 +61,12 @@ textarea:focus, input:focus, button:focus, select:focus {
     height: 32px;
     top: -25px;
     right: 5px;
-    background: #E91E63;
-    position: absolute;
+    background: #F44336;
     border-radius: 5px;
     font-size: 15px;
-	color: #8c1d43;
+	color: rgba(0, 0, 0, 0.55);
 	font-weight: bold;
 	font-family: Tahoma;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.50);
-	border-top: 1px solid rgba(255, 255, 255, 0.50);
 }
 .uiWindow .close:hover {filter: brightness(120%);}
 .uiWindow .close:focus {filter: brightness(90%);}
@@ -74,4 +77,57 @@ textarea:focus, input:focus, button:focus, select:focus {
 	text-align: center;
 	user-select: none;
 	pointer-events: none;
+}
+.uiWindow .btn {
+	padding: 5px;
+	border-radius: 1em;
+	color: white;
+	background: #00BCD4;
+	cursor: pointer;
+	width: 100%;
+	margin-top:70%;
+}
+.uiWindow .btn:hover {filter: brightness(120%)}
+.uiWindow .btn:focus {filter: brightness(90%);}
+
+.uiRadio {
+	display:none;
+}
+.uiRadio:checked + label, .uiRadio:not(:checked) + label {
+	position: relative;
+	padding-left: 1.5em;
+	cursor: pointer;
+	line-height: 20px;
+	display: inline-block;
+}
+.uiRadio:checked + label:before, .uiRadio:not(:checked) + label:before {
+	content: "";
+	position:absolute;
+	left: 2px;
+	top: 3px;
+	width: 14px; height: 14px;
+	border-radius: 100%;
+	background: rgb(0, 0, 0, 0.60);
+	border-bottom: 0.90px solid rgba(0, 0, 0, 0.70);
+	border-top: 0.90px solid rgba(255, 255, 255, 0.70);
+}
+.uiRadio:checked + label:after {
+	content: "";
+	position: absolute;
+	top:7px;
+	left: 5px;	
+	width: 8px;
+	height: 8px;
+	background: rgb(255, 255, 255,  0.80);
+	border-radius: 100%;
+}
+
+
+/** End Components **/
+
+hr {
+	border-radius: 15px;
+	border-top: 1px solid rgba(0, 0, 0, 0.3);
+	border-bottom: 1px solid rgba(255,255, 255, 0.3);
+	margin: 10px 0 10px 0;
 }

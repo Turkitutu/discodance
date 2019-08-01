@@ -169,7 +169,7 @@ class ByteArray {
 
     checkSize(length) {
         if (this.writeOffset+length > this.data.length){
-            this._buffer = Buffer.concat([this._buffer, Buffer.alloc(this.defaultSize)]);
+            this._buffer = Buffer.concat([this._buffer, Buffer.alloc(Math.ceil((this.writeOffset+length-this.data.length)/this.defaultSize)*this.defaultSize)]);
             this.data = this._buffer.slice(4);
         }
     }

@@ -18,9 +18,13 @@ module.exports = class Camera {
             this._scale = 1;
         }
     }
+    center(scene) {
+        scene.$position.set(this.app.width/2, this.app.height/2);
+    }
     target(scene) {
         if (this._target) {
             this.app.$stage.addChild(this._target);
+            this.center(this._target);
         }
         this._target = scene;
         this.container.addChild(scene);

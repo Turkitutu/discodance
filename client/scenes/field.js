@@ -1,34 +1,41 @@
-const PhysicObject = require('../physics/object.js'),
+const Scene = require('../core/scene.js'),
+      PhysicObject = require('../physics/object.js'),
       Player = require('../physics/player.js'),
-      fields = [
-          require('../fields/Hollywood.js'),
-      ];
+      fields = require('../fields/');
 
-class Field extends PIXI.Container {
+class Field extends Scene {
     constructor() {
         super();
-        this.name = 'field';
         this.reset();
+        fields.forEach(field => field.construct = field.construct.bind(this));
     }
     reset() {
         this.playerList = [];
         this.objectList = [];
         this.loaded = false;
         this.spawnOffset = 0;
+        this.field = null;
     }
     play() {
-        this.scenes.play('interface', true);
+        this.scenes.interface.play();
+        
         this.field = fields[this.world.fieldId];
+        
         PhysicObject.colorTarget = this.playerList;
+        
         PIXI.loaders.shared
             .add(this.field.assets)
             .load((loader, resources) => {
-                this.field.construct.call(this, resources);
+                this.field.construct(resources);
                 this.loaded = true;
                 this.load();
             });
+
+        this.enable();
     }
     load() {
+        this.camera.target(this);
+
         this.player = new Player();
         this.addPlayer(this.player);
 
@@ -51,12 +58,12 @@ class Field extends PIXI.Container {
         this.world.update(delta);
     }
     disable() {
-        this.reset();
         this.world.clear();
         for (const child of this.$children) {
             this.removeChild(child);
             child.destroy(true);
         }
+        this.reset();
 
         super.disable();
     }

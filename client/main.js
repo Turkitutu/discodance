@@ -3,12 +3,14 @@ window.PIXI = require('../libs/pixi.js');
 window.Matter = require('../libs/matter.js');
 window.dragonBones = require('../libs/dragonbones.js');
 
-const SceneManager = require('./scene-manager.js'),
-      Camera = require('./camera.js'),
-      Keyboard = require('./keyboard.js'),
-      World = require('./physics/world.js'),
-      Connection = require("./connection.js"),
-      keysDefault = require('./utils/keys-default.js');
+const { 
+        SceneManager,
+        Camera,
+        Keyboard,
+        Connection
+    } = require('./core/'),
+    World = require('./physics/world.js'),
+    keysDefault = require('./utils/keys-default.js');
 
 const app = new PIXI.Application({
     $width: window.$innerWidth,
@@ -44,8 +46,6 @@ const keyboard = new Keyboard();
 keyboard.batchRegister(keysDefault);
 
 const sceneManager = new SceneManager(app, connection, world, camera, keyboard);
-
-sceneManager.play('preload');
 
 app.ticker.add(delta => {
     sceneManager.update(delta);

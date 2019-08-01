@@ -1,4 +1,4 @@
-const ByteArray = require('../shared/bytearray.js');
+const ByteArray = require('../../shared/bytearray.js');
 
 module.exports = class Connection {
     constructor() {
@@ -78,7 +78,6 @@ module.exports = class Connection {
                 packet.setSpecialByte(id, 1);
             }
             this.outgoing[cog].packets[id](packet, ...args);
-            console.log(packet.data);
             this.socket.$send(packet.buffer);
         }
     }

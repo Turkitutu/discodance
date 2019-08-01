@@ -5,7 +5,7 @@
   "description": "HTML5 game",
   "main": "index.js",
   "scripts": {
-    "start": "npm run server && npm run client",
+    "start": "npm run client && npm run server",
     "client": "node webpack.js",
     "server": "node app.js"
   },

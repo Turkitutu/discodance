@@ -1,11 +1,11 @@
-const {incoming, outgoing, cogs} = require('../utils/enums.js');
-const ByteArray = require('../../shared/bytearray.js')
+const Scene = require('../core/scene.js'),
+      {incoming, outgoing, cogs} = require('../utils/enums.js'),
+      ByteArray = require('../../shared/bytearray.js');
 
 
-module.exports = class preload extends PIXI.Container {
+module.exports = class preload extends Scene {
     constructor() {
         super();
-        this.name = 'preload';
         this.loaded = false;
 
         this.connection.use(outgoing, cogs.authentication.id, (id, packet) => {
@@ -61,10 +61,12 @@ module.exports = class preload extends PIXI.Container {
                 this.loaded = true;
             });
         });
+
+        this.enable();
     }
     update() {
         if (this.loaded && this.connection.connected) {
-            this.scenes.play('login');
+            this.scenes.login.play();
             this.disable();
         }
     }
