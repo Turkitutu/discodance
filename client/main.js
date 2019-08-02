@@ -1,7 +1,7 @@
-require('../libs/others.js');
-window.PIXI = require('../libs/pixi.js');
-window.Matter = require('../libs/matter.js');
-window.dragonBones = require('../libs/dragonbones.js');
+require('../libs/others.ref.js');
+window.PIXI = require('../libs/pixi.ref.js');
+window.Matter = require('../libs/matter.ref.js');
+window.dragonBones = require('../libs/dragonbones.ref.js');
 
 const { 
         SceneManager,
