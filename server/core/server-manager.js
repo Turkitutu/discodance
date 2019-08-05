@@ -1,4 +1,5 @@
 const WebSocket = require("ws"),
+	  MongoClient = require('mongodb').MongoClient,
 	  Packet = require("./packet.js"),
 	  Player = require("./player.js"),
 	  Room = require("./room.js"),
@@ -12,7 +13,10 @@ class ServerManager {
 			name => new (require("../"+name))(name) 
 		);
 	}
-	startServer() {
+	async startServer() {
+		this.database = await MongoClient.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
+		console.log("Database loaded successfully!");
+
 		this.wss = new WebSocket.Server({port: process.env.SERVER_PORT});
 		console.log("Success!");
 		const room = new Room([]);

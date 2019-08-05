@@ -4,6 +4,7 @@ class Player {
     constructor(server, ws, req) {
         this.server = server;
         this.socket = ws;
+        this.database = this.server.database;
         this.ipAddress = req.connection.remoteAddress;
         this.lastHeartbeat = 0;
         this.ping = 0;
@@ -20,11 +21,17 @@ class Player {
         return !!this.id; //if player has id then he is logged in.
     }
     */
-    /*
-    login(name, password) {
+    
+    async login(name, password) {
         //use the database to load info about the player    
+        result = await this.database.collection("users").findOne({ name: name, password: name});
+        if (result) {
+            this.data = result;
+        }else {
+            // send login error packet
+        }
     }
-    */
+    
 }
 
 setInterval(() => {
