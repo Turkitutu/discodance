@@ -22,16 +22,14 @@ class Player {
     }
     */
     
-    login(name, password) {
+    async login(name, password) {
         //use the database to load info about the player    
-        this.database.collection("users").findOne( { name: name, password: password}, (err, data) => {
-            if (data) {
-                this.data = data;
-            } else {
-                // send login error packet
-            }
+        result = await this.database.collection("users").findOne({ name: name, password: name});
+        if (result) {
+            this.data = result;
+        }else {
+            // send login error packet
         }
-
     }
     
 }

@@ -13,12 +13,9 @@ class ServerManager {
 			name => new (require("../"+name))(name) 
 		);
 	}
-	startServer() {
-		MongoClient.connect(process.env.DATABASE_URL, function(err, db) {
-		  if (err) throw err;
-		  this.database = db.db("discodance");
-		  console.log("Database loaded successfully!");
-		});
+	async startServer() {
+		this.database = await MongoClient.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
+		console.log("Database loaded successfully!");
 
 		this.wss = new WebSocket.Server({port: process.env.SERVER_PORT});
 		console.log("Success!");
