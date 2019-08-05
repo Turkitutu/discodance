@@ -6,13 +6,14 @@ const assets = [
 
 function construct(resources) {
     this.addObject(new PhysicObject({
-        shape: 'rectangle',
-        properties: [0, 100, 810, 60],
-        $isStatic: true
+        shape: new box2d.b2PolygonShape().SetAsBox(10, 0.5),
+        x: 0,
+        y: 5
     }));
-    this.addObject(PhysicObject.createColorSpot({
-        shape: 'rectangle',
-        properties: [0, 80, 100, 21]
+    this.addObject(PhysicObject.createColor({
+        shape: new box2d.b2PolygonShape().SetAsBox(1, 0.15),
+        x: 0,
+        y: 4.35
     }));
 }
 

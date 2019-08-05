@@ -1,13 +1,14 @@
 require('../libs/others.ref.js');
+window.box2d = require('../libs/box2d.ref.js')
 window.PIXI = require('../libs/pixi.ref.js');
-window.Matter = require('../libs/matter.ref.js');
 window.dragonBones = require('../libs/dragonbones.ref.js');
 
 const { 
         SceneManager,
         Camera,
         Keyboard,
-        Connection
+        Connection,
+        SystemUI
     } = require('./core/'),
     World = require('./physics/world.js'),
     keysDefault = require('./utils/keys-default.js');
@@ -16,12 +17,14 @@ const app = new PIXI.Application({
     $width: window.$innerWidth,
     $height: window.$innerHeight,
     $autoResize: true,
+    $antialias: true,
     $resolution: window.$devicePixelRatio || 1
 });
 
 app.width = 2560;
 app.height = 1440;
-Camera.handleResize(app);
+SystemUI.app = app;
+Camera.handleResize(app, SystemUI.components);
 
 window.$onload = () => {
     document.$body.$style.$overflow = 'hidden'
@@ -31,10 +34,7 @@ window.$onload = () => {
 }
 
 const world = new World({
-    $gravity: {
-        $x: 0,
-        $y: 3
-    },
+    gravity: 10,
     debug: true
 });
 

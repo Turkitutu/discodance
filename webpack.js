@@ -7,7 +7,7 @@ const webpack = require('webpack'),
 
 require('dotenv').config();
 
-var mustInclude = ['Ticker', 'ObservablePoint', 'Loader', 'BaseFactory', 'Animation']; 
+var mustInclude = ['Ticker', 'ObservablePoint', 'Loader', 'BaseFactory', 'Animation', 'b2Rot', 'b2World']; 
 
 var reserved = []; //property names that must not be changed during the minifying process;
 var filtered = ['name', 'set'];
@@ -100,13 +100,13 @@ function generate() {
             }
         } 
     }
-    const refs = walkSync('./libs/').filter(name => name.match(/\.ref/));
+    const refs = walkSync('./libs/').filter(name => name.match(/\.json/));
     for (const filename of refs) {
         const lib = JSON.parse(fs.readFileSync(filename));
         let str = [`const ${lib.name} = ${lib.parentName};`];
         stringify(str, lib.children);
         str.push(`module.exports = ${lib.name};`);
-        fs.writeFileSync(filename.replace('.ref', ''), str.join('\n'));
+        fs.writeFileSync(filename.replace('.json', '.js'), str.join('\n'));
     }
 }
 

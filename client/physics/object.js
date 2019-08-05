@@ -1,68 +1,42 @@
-const Emitter = require('../utils/emitter'),
-      Bodies = Matter.Bodies,
-      Body = Matter.Body;
+const Emitter = require('../utils/emitter.js');
 
 class PhysicObject extends Emitter {
     constructor(options) {
         super();
 
-        if (options.fixedRotation) {
-            options.$inertia = Infinity;   
-        }
+        this.bodyDef = new box2d.b2BodyDef();
+        this.bodyDef.$type = options.type || box2d.b2BodyType.b2_staticBody;
+        this.bodyDef.$position.Set(options.x || 0, options.y || 0);
+        this.bodyDef.$angle = options.angle ? options.angle*box2d.b2_pi_over_180 : 0;
+        this.bodyDef.$fixedRotation = options.fixedRotation;
+        this.shape = options.shape;
 
-        this.body = Bodies[options.shape].apply(null, options.properties.concat([options]));
-        this.body.object = this;
+        this.fixtureDef = new box2d.b2FixtureDef();
+        this.fixtureDef.$shape = this.shape;
+        this.fixtureDef.$density = options.density!==undefined ? options.density : 1;
+        this.fixtureDef.$friction = options.friction!==undefined ? options.friction : 0.3;
+        this.fixtureDef.$restitution = options.restitution!==undefined ? options.restitution : 0.2;
+        this.fixtureDef.$isSensor = options.isSensor;
 
         if (options.sprite) {
             this.sprite = options.sprite.object;
-            this.size = options.sprite.size;
-            this.origin = [-this.size[0]*options.sprite.anchor[0], this.size[1]*options.sprite.anchor[1]];
+            this.origin = [-options.sprite.size[0]*options.sprite.anchor[0]*100, options.sprite.size[1]*options.sprite.anchor[1]*100];
             if (options.sprite.scale)
                 this.sprite.$scale.set(options.sprite.scale[0], options.sprite.scale[1]);
         }
-
-        this._vector = { $x: 0, $y: 0 };
-        this._force = { $x: 0, $y: 0 };
     }
-    static createColorSpot(options) {
-        options.$isSensor = true;
-        options.$isStatic = true;
+    static createColor(options) {
+        options.isSensor = true;
         const obj = new this(options);
+        obj.isColor = true;
         obj.id = options.id;
-        return obj
-        .on('collisionStart', player => {
-            if (player.isPlayer) player.color = obj; 
-        })
-        .on('collisionEnd', player => {
-            if (player.isPlayer && player.color == obj) player.color = null;
-        });
-    }
-    teleport(x, y) {
-        this._vector.$x = x;
-        this._vector.$y = y;
-        Body.setPosition(this.body, this._vector);
-    }
-    translate(x, y) {
-        this._vector.$x = x;
-        this._vector.$y = y;
-        Body.translate(this.body, this._vector);
-    }
-    applyForce(x, y, valueX, valueY) {
-        this._force.$x = valueX;
-        this._force.$y = valueY;
-        this._vector.$x = x;
-        this._vector.$y = y;
-        Body.applyForce(this.body, this._vector, this._force);
-    }
-    setVelocity(x, y) {
-        this._vector.$x = x || this.body.$velocity.$x;
-        this._vector.$y = y || this.body.$velocity.$y;
-        Body.setVelocity(this.body, this._vector);
+        return obj;
     }
     update() {
-        if (this.sprite) {
-            this.sprite.$position.set(this.body.$position.$x+this.origin[0], this.body.$position.$y+this.origin[1]);
-            this.sprite.$rotation = this.body.$angle;
+        if (this.sprite && this.body) {
+            const position = this.body.GetPosition();
+            window.$ho ? '' : window.$ho=!console.log(this.sprite);
+            this.sprite.$position.set(position.$x*100+this.origin[0], position.$y*100+this.origin[1]);
         }
     }
 }

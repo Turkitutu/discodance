@@ -71,7 +71,7 @@ module.exports = class Camera {
             this.container.$scale.set(zoom, zoom);
         }
     }
-    static handleResize(app) {
+    static handleResize(app, components) {
         const resize = () => {
             let width = window.$innerWidth,
                 height = window.$innerHeight,
@@ -90,6 +90,11 @@ module.exports = class Camera {
                 scale = height/app.height;
                 app.fullWidth = app.height*app.fullRatio;
                 app.fullHeight = app.height;
+            }
+            for (const component of components) {
+                if (component.$visible && component.dom) {
+                    component.update();
+                }
             }
             app.$stage.$scale.set(scale, scale);
         }

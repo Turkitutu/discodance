@@ -1,28 +1,51 @@
 const SystemUI = {};
+const components = new Set();
+
+SystemUI.components = components;
 
 const defaultOptions = {
 	size: {},
 	pos: {}
 }
 
-SystemUI.Component = class {
-	constructor(app, options) {
+class customTransform extends PIXI.TransformStatic {
+	constructor(component) {
+		super();
+		this.component = component;
+	}
+	$onChange() {
+		super.onChange();
+		this.component.update();
+	}
+}
+
+SystemUI.Component = class extends PIXI.DisplayObject {
+	constructor(options) {
+		super();
+		components.$add(this);
 		Object.assign(this, defaultOptions, options);
-		this.app = app;
 		this.attrs = options.attrs || {};
 		this.style = options.style || {};
 		this.dom = null; // html elements
-		this.isAppended = false;
+		this.$visible = false;
 		this.size.max = this.size.max || {};
 		this.size.min = this.size.min || {};
+		this.$transform = new customTransform(this);
+
+		SystemUI.app.$stage.addChild(this);
 	}
 	show() {
 		document.$body.$appendChild(this.dom);
-		this.isAppended = true;
+		this.$visible = true;
 	}
-	remove() {
+	hide() {
 		this.dom.$remove();
-		this.isAppended = false;
+		this.$visible = false;
+		if (this.removeOnHide) {
+			delete this.dom;
+			this.$destory(true);
+			components.$delete(this);
+		}
 	}
 	addClass(className, dom) {
 		dom = dom || this.dom;
@@ -46,8 +69,7 @@ SystemUI.Component = class {
 		}
 		if (pos) {
 			if (!this.useClassPositions) {
-				this.dom.$style.$top = (this.pos.x || 0) + "px";
-				this.dom.$style.$left = (this.pos.y || 0) + "px";
+				this.$position.set(this.position.x||0, this.position.y||0);
 			}
 		}
 	}
@@ -58,63 +80,74 @@ SystemUI.Component = class {
 		for (const [attr, value] of Object.entries(this.attrs)) {
 			this.dom.$setAttribute(attr, value);
 		}
+		this.show();
+		this.update();
 	}
+	update() {
+		const app = SystemUI.app,
+			  element = this.dom,
+			  scale = app.$stage.$scale.$x,
+	          style = element.$style;
+	    style.$transform=style.$msTransform=style.$MozTransform=style.$OTransform=style.$WebkitTransform
+	    =(this.useClassPositions ? '' : `translate(${this.$position.$x*window.$innerWidth/app.width-element.$offsetWidth/2}px, ${this.$position.$y*window.$innerHeight/app.height-element.$offsetHeight/2}px)`) + (this.useClassesSize ? '' : `scale(${this.$scale.$x*scale}, ${this.$scale.$y*scale})`);
+	}
+	/*
 	center(left=0.5, top=0.5, transform=[-0.5,-0.5]) {
 		this.dom.$style.$top = typeof top === "string" ? top : (100*top) + "%";
 		this.dom.$style.$left = typeof left === "string" ? left : (100*left) + "%";
 		transform[0] = typeof transform[0] !== "string" ? transform[0] = 100 * transform[0] + "%" : transform[0]
 		transform[1] = typeof transform[1] !== "string" ? transform[1] = 100 * transform[1] + "%" : transform[1]
 		this.dom.$style.$transform = `translate(${transform[0]}, ${transform[1]})`;
-	}
+	}*/
 }
 SystemUI.TextInput = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement(this.isTextArea ? "textarea" : "input");
+		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.create();
-		this.dom.$style.$position = "absolute";
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		if (!this.isTextArea) this.dom.$type = this.type || "text";
 		super.create();
 	}
 }
 SystemUI.Button = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("button");
+		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.create();
 		this.value = this.value || "$VALUE"
-		this.dom.$style.$position = "absolute";
 		this.dom.$append(this.value);
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		this.dom.$type = this.type || "button";
 		super.create();
 	}
 }
 SystemUI.SelectOptions = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("select");
+		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.create();
-		this.dom.$style.$position = "absolute";
 		this.show();
-		this.options_list = this.options_list.map(x => new SystemUI.option(this.app, this.dom, x)) || [];
+		this.options_list = this.options_list.map(x => new SystemUI.option(this.dom, x)) || [];
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		super.create();
 	}
 }
 SystemUI.Option = class extends SystemUI.Component {
-	constructor(app, so_dom, options) {
-		super(app, options);
+	constructor(so_dom, options) {
+		super(options);
 		this.so_dom = so_dom;
 		this.dom = document.$createElement("option");
 		this.create();
@@ -123,38 +156,38 @@ SystemUI.Option = class extends SystemUI.Component {
 		this.so_dom.$append(this.dom);
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		this.dom.$value = this.value;
 		super.create();
-		this.isAppended = true;
+		this.$visible = true;
 	}
 	show() {}
 }
 SystemUI.Checkbox = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("input");
+		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.create();
-		this.dom.$style.$position = "absolute";
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		this.dom.$type = "checkbox";
 		super.create();
 	}
 }
 SystemUI.Radio = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("input");
+		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.create();
-		this.dom.$style.$position = "absolute";
-		this.label = new SystemUI.Label(this.app, {forID: this.dom.$id, value: this.value});
+		this.label = new SystemUI.Label({forID: this.dom.$id, value: this.value});
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		this.dom.$type = "radio";
 		super.create();
 	}
@@ -164,53 +197,52 @@ SystemUI.Radio = class extends SystemUI.Component {
 	}
 }
 SystemUI.Label = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("label");
+		this.dom.$style.$position = "absolute";
 		this.autoSet(false, true);
 		this.create();
-		this.dom.$style.$position = "absolute";
 		if (!this.attrs["for"] && this.forID) {
 			this.dom.$setAttribute("for", this.forID)
 		}
 		this.dom.$append(this.value || "Value");
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		super.create();
 	}
 }
 SystemUI.TextField = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("span");
-		this.autoSet(false, true);
 		this.dom.$style.$position = "absolute";
+		this.autoSet(false, true);
 		this.create();
 		this.dom.$append(this.value || "$TEXT");
 	}
 	create() {
-		if (this.isAppended) return;
+		if (this.$visible) return;
 		super.create();
 	}
 }
 SystemUI.Popup = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("div");
 		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.headerTitle = this.headerTitle || "Popup";
 		this.content = this.content || "$CONTENT_HERE";
 		this.create(this.allowClose);
-		if (this.centered === undefined || this.centered) {
+		/*if (this.centered === undefined || this.centered) {
 			this.center();
-		}
+		}*/
 		// this.loadButtons();
 	}
 	create(allowClose) {
-		if (this.isAppended) return;
-		super.create();
+		if (this.$visible) return;
 		this.addClass("uiContainer");
 		this.addClass("bg");
 		this.addClass("uiWindow");
@@ -222,15 +254,16 @@ SystemUI.Popup = class extends SystemUI.Component {
 			this.dom.$insertBefore(titleField, this.dom.$firstChild);
 			titleField.$textContent = this.headerTitle;
 		}
-		this.textContent = new SystemUI.TextField(this.app, {attrs: {"$class": "text"}, style: {"$word-wrap": "break-word", "$position": "relative", "$width": this.dom.$style.$width, "$height": this.dom.$style.$height}, useClassPositions: true, value: this.content});
+		this.textContent = new SystemUI.TextField({attrs: {"$class": "text"}, style: {"$word-wrap": "break-word", "$position": "relative", "$width": this.dom.$style.$width, "$height": this.dom.$style.$height}, useClassPositions: true, value: this.content});
 		this.dom.$insertBefore(this.textContent.dom, this.dom.$firstChild);
 		if (allowClose) {
-			this.closeButton = new SystemUI.Button(this.app, {attrs: {"$class": "close"}, useClassPositions: true, useClassSize: true, value: "X"});
+			this.closeButton = new SystemUI.Button({attrs: {"$class": "close"}, useClassPositions: true, useClassSize: true, value: "X"});
 			this.dom.$appendChild(this.closeButton.dom);
 			this.closeButton.dom.$onclick = event => {
-				this.remove();
+				this.hide();
 			};
 		}
+		super.create();		
 	}
 	// loadButtons() {
 		// if (this.buttons && this.buttons.length > 0) {
@@ -244,20 +277,19 @@ SystemUI.Popup = class extends SystemUI.Component {
 	// }
 }
 SystemUI.Panel = class extends SystemUI.Component {
-	constructor(app, options) {
-		super(app, options);
+	constructor(options) {
+		super(options);
 		this.dom = document.$createElement("div");
 		this.dom.$style.$position = "absolute";
 		this.autoSet(true, true);
 		this.headerTitle = this.headerTitle || "Window";
 		this.create(this.allowClose);
-		if (this.centered === undefined || this.centered) {
+		/*if (this.centered === undefined || this.centered) {
 			this.center();
-		}
+		}*/
 	}
 	create(allowClose) {
-		if (this.isAppended) return;
-		super.create();
+		if (this.$visible) return;
 		this.addClass("uiContainer");
 		this.addClass("bg");
 		this.addClass("uiWindow");
@@ -270,12 +302,13 @@ SystemUI.Panel = class extends SystemUI.Component {
 			titleField.$textContent = this.headerTitle;
 		}
 		if (allowClose) {
-			this.closeButton = new SystemUI.Button(this.app, {attrs: {"$class": "close"}, useClassPositions: true, useClassSize: true, value: "X"});
+			this.closeButton = new SystemUI.Button({attrs: {"$class": "close"}, useClassPositions: true, useClassSize: true, value: "X"});
 			this.dom.$appendChild(this.closeButton.dom);
 			this.closeButton.dom.$onclick = event => {
-				this.remove();
+				this.hide();
 			};
 		}
+		super.create();
 	}
 }
 module.exports = SystemUI;

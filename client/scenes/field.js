@@ -11,7 +11,6 @@ class Field extends Scene {
     }
     reset() {
         this.playerList = [];
-        this.objectList = [];
         this.loaded = false;
         this.spawnOffset = 0;
         this.field = null;
@@ -36,15 +35,13 @@ class Field extends Scene {
     load() {
         this.camera.target(this);
 
-        this.player = new Player();
+        this.player = new Player(this.nextSpawn());
         this.addPlayer(this.player);
 
-        this.world.add(this.objectList);
+        this.addChild(this.world.debug.renderer);
 
-        this.addChild(this.world.renderer);
-
-        this.camera.focus(this.playerList);
-        this.camera.zoom(0.7);
+        //this.camera.focus(this.playerList);
+        //this.camera.zoom(0.7);
     }
     update(delta) {
         if (!this.loaded) return;
@@ -67,14 +64,15 @@ class Field extends Scene {
 
         super.disable();
     }
+    nextSpawn() {
+        return this.field.spawn[this.spawnOffset++] || this.field.spawn[this.spawnOffset=0];
+    }
     addPlayer(player) {
-        const position = this.field.spawn[this.spawnOffset++] || this.field.spawn[this.spawnOffset=0];
-        player.teleport(position[0], position[1]);
+        this.world.add(player);
         this.playerList.push(player);
-        this.addObject(player);
     }
     addObject(obj) {
-        this.objectList.push(obj);
+        this.world.add(obj);
         if (obj.sprite) this.addChild(obj.sprite);
     }
 }
