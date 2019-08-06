@@ -40,8 +40,8 @@ class Field extends Scene {
 
         this.addChild(this.world.debug.renderer);
 
-        //this.camera.focus(this.playerList);
-        //this.camera.zoom(0.7);
+        this.camera.focus(this.playerList);
+        this.camera.zoom(0.1);
     }
     update(delta) {
         if (!this.loaded) return;
@@ -68,7 +68,7 @@ class Field extends Scene {
         return this.field.spawn[this.spawnOffset++] || this.field.spawn[this.spawnOffset=0];
     }
     addPlayer(player) {
-        this.world.add(player);
+        this.addObject(player);
         this.playerList.push(player);
     }
     addObject(obj) {

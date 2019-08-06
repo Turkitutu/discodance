@@ -23,6 +23,7 @@ dragonbones.Animation.prototype.init = dragonbones.Animation.prototype.$init;
 dragonbones.Animation.prototype.reset = dragonbones.Animation.prototype.$reset;
 dragonbones.Animation.prototype.play = dragonbones.Animation.prototype.$play;
 dragonbones.Animation.prototype.fadeIn = dragonbones.Animation.prototype.$fadeIn;
+Object.defineProperty(dragonbones.Animation.prototype, "lastAnimationName", Object.getOwnPropertyDescriptor(dragonbones.Animation.prototype, "lastAnimationName"));
 dragonbones.BaseFactory = dragonbones.$BaseFactory;
 dragonbones.BaseFactory.prototype.parseDragonBonesData = dragonbones.BaseFactory.prototype.$parseDragonBonesData;
 dragonbones.BaseFactory.prototype.parseTextureAtlasData = dragonbones.BaseFactory.prototype.$parseTextureAtlasData;

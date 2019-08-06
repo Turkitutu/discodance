@@ -3,6 +3,7 @@ Matterjs.version = Matterjs.$version;
 Matterjs.Body = Matterjs.$Body;
 Matterjs.Body.set = Matterjs.Body.$set;
 Matterjs.Body.translate = Matterjs.Body.$translate;
+Matterjs.Body.rotate = Matterjs.Body.$rotate;
 Matterjs.Body.scale = Matterjs.Body.$scale;
 Matterjs.Body.update = Matterjs.Body.$update;
 Matterjs.World = Matterjs.$World;

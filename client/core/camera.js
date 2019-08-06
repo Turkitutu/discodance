@@ -49,8 +49,9 @@ module.exports = class Camera {
         let length = 0;
         for (const obj of this._focus) {
             length++;
-            this._barycenter.$x += obj.body.$position.$x;
-            this._barycenter.$y += obj.body.$position.$y;
+            const position = obj.body.GetPosition();
+            this._barycenter.$x += position.x*100;
+            this._barycenter.$y += position.y*100;
         }
         this._barycenter.$x /= length;
         this._barycenter.$y /= length;
@@ -64,11 +65,12 @@ module.exports = class Camera {
             this.translate(Math.abs(posX) > this.tolerance ? posX*this.speed : posX, Math.abs(posY) > this.tolerance ? posY*this.speed : posY);
             let dx = 0, dy = 0;
             for (const target of this._focus) {
-                dx = Math.max(dx, Math.abs(bc.$x-target.body.$position.$x)+target.size[0]/2);
-                dy = Math.max(dy, Math.abs(bc.$y-target.body.$position.$y)+target.size[1]/2);
+                const position = target.body.GetPosition();
+                dx = Math.max(dx, Math.abs(bc.$x-position.x*100)+target.width/2);
+                dy = Math.max(dy, Math.abs(bc.$y-position.y*100)+target.height/2);
             }
-            const zoom = dx/this.app.fullRatio > dy ? this.app.fullWidth*this._scale/(dx*2) : this.app.fullHeight*this._scale/(dy*2);
-            this.container.$scale.set(zoom, zoom);
+            const zoom = dx/this.app.fullRatio > dy ? this.app.fullWidth*this._scale/(dx*4) : this.app.fullHeight*this._scale/(dy*4);
+            this.container.$scale.set(zoom);
         }
     }
     static handleResize(app, components) {

@@ -1,4 +1,9 @@
 const keys = {
+    up: {
+        name: "up",
+        keyCode: 38,
+        aliases: [87]
+    },
     left: {
         name: "left",
         keyCode: 37,
