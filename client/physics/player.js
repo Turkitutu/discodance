@@ -19,24 +19,30 @@ module.exports = class Player extends PhysicObject {
             },
             fixedRotation: true
         });
-        const sensor = new box2d.b2FixtureDef(),
+        const rightBottom = new box2d.b2FixtureDef(),
+              leftBottom = new box2d.b2FixtureDef(),
               rightSide = new box2d.b2FixtureDef(),
               leftSide = new box2d.b2FixtureDef(),
               sensorSize = 0.04,
-              halfWidth = width / 2,
-              partHeight = height*3/4,
-              pos = new box2d.b2Vec2(0, height-sensorSize);
-        sensor.$isSensor=rightSide.$isSensor=leftSide.$isSensor=true;
-        sensor.bottom=rightSide.right=leftSide.left=true;
-        sensor.$shape = new box2d.b2PolygonShape().SetAsBox(width-0.03, sensorSize, pos);
-        pos.x = halfWidth;
-        pos.y = height/4;
-        rightSide.$shape = new box2d.b2PolygonShape().SetAsBox(halfWidth, partHeight, pos);
+              sideSize = 0.01,
+              sensorWidth = width/2-0.02,
+              partHeight = height/2,
+              pos = new box2d.b2Vec2(sensorWidth, height+sensorSize);
+        leftBottom.$isSensor=rightBottom.$isSensor=rightSide.$isSensor=leftSide.$isSensor=true;
+        leftBottom.bottom=rightBottom.bottom=leftBottom.left=rightBottom.right=rightSide.rightWall=leftSide.leftWall=true;
+        rightBottom.$shape = new box2d.b2PolygonShape().SetAsBox(sensorWidth, sensorSize, pos);
         pos.x *= -1;
-        leftSide.$shape = new box2d.b2PolygonShape().SetAsBox(halfWidth, partHeight, pos);
-        this.fixtures.push(sensor, rightSide, leftSide);
+        leftBottom.$shape = new box2d.b2PolygonShape().SetAsBox(sensorWidth, sensorSize, pos);
+        pos.x = width;
+        pos.y = 0;
+        rightSide.$shape = new box2d.b2PolygonShape().SetAsBox(sideSize, partHeight, pos);
+        pos.x *= -1;
+        leftSide.$shape = new box2d.b2PolygonShape().SetAsBox(sideSize, partHeight, pos);
+        this.fixtures.push(rightBottom, leftBottom, rightSide, leftSide);
         this.left = {};
         this.right = {};
+        this.bottom = 0;
+        this.sliding = false;
         this.width = width*200;
         this.height = height*200;
         this.movement = [];
@@ -113,6 +119,12 @@ module.exports = class Player extends PhysicObject {
     onLanding() {
         this.jumps = 0;
         this.state = '';
+    }
+    onSlide() {
+        console.log('sliding');
+    }
+    onSlideLeave() {
+        console.log('not sliding');
     }
     static handleMoves(input) {
         return [input.keyDown.right > input.keyDown.left, input.keyDown.right < input.keyDown.left, input.wasModified.up && input.keyDown.up];

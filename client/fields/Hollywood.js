@@ -5,8 +5,6 @@ const assets = [
 ]
 
 function construct(resources) {
-    //TODO: Switch colors to sensors and put big ground above them, because when they are side by side the player get stuck
-    //Colors could be fixtures to the same body.
     this.addObject(new PhysicObject({
         shape: new box2d.b2PolygonShape().SetAsBox(10, 1),
         x: 0,

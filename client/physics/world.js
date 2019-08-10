@@ -27,6 +27,8 @@ class GameWorld {
             fixt.bottom = fixture.bottom;
             fixt.left = fixture.left;
             fixt.right = fixture.right;
+            fixt.leftWall = fixture.leftWall;
+            fixt.rightWall = fixture.rightWall;
         }
         delete obj.fixtures;
         obj.body.physicObject = obj;

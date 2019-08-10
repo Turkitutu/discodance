@@ -23,31 +23,52 @@ class ContactListener extends box2d.b2ContactListener {
     checkContact(fixtureA, bodyA, fixtureB) {
         if (fixtureA.IsSensor() && bodyA.isPlayer) {
             if (fixtureA.bottom) {
-                bodyA.onLanding();
-            } else if (fixtureB.isColor) {
-                const color = fixtureB.colorCode;
-                if (color) {
-                    if (fixtureA.left) {
-                        bodyA.left[color] = true;
-                    } else if (fixtureA.right) {
-                        bodyA.right[color] = true;
+                bodyA.bottom++;
+                if (bodyA.bottom == 1) {
+                    if (bodyA.sliding) {
+                        bodyA.sliding = false;
+                        bodyA.onSlideLeave();
                     }
-                    this.checkColor(bodyA);
+                    bodyA.onLanding();
+                }
+                if (fixtureB.isColor) {
+                    const color = fixtureB.colorCode;
+                    if (color) {
+                        if (fixtureA.left) {
+                            bodyA.left[color] = true;
+                        } else {
+                            bodyA.right[color] = true;
+                        }
+                        this.checkColor(bodyA);
+                    }
+                }
+            } else {
+                if (!bodyA.sliding && !bodyA.bottom) {
+                    bodyA.sliding = fixtureA.leftWall ? 1 : 2;
+                    bodyA.onSlide();
                 }
             }
         }
     }
     checkLeave(fixtureA, bodyA, fixtureB) {
-        if (bodyA.isPlayer) {
-            if (fixtureB.isColor) {
-                const color = fixtureB.colorCode;
-                if (color) {
-                    if (fixtureA.left) {
-                        delete bodyA.left[color];
-                    } else if (fixtureA.right) {
-                        delete bodyA.right[color];
+        if (fixtureA.IsSensor() && bodyA.isPlayer) {
+            if (fixtureA.bottom) {
+                bodyA.bottom--;
+                if (fixtureB.isColor) {
+                    const color = fixtureB.colorCode;
+                    if (color) {
+                        if (fixtureA.left) {
+                            delete bodyA.left[color];
+                        } else if (fixtureA.right) {
+                            delete bodyA.right[color];
+                        }
+                        this.checkColor(bodyA);
                     }
-                    this.checkColor(bodyA);
+                }
+            } else {
+                if (bodyA.sliding) {
+                    bodyA.sliding = 0;
+                    bodyA.onSlideLeave();
                 }
             }
         }
@@ -67,10 +88,10 @@ class ContactListener extends box2d.b2ContactListener {
     $EndContact(contact) {
         const fixtureA = contact.GetFixtureA(),
               bodyA = fixtureA.GetBody().physicObject;
-        if (bodyA && fixtureA.IsSensor()) {
+        if (bodyA) {
             const fixtureB = contact.GetFixtureB(),
                   bodyB = fixtureB.GetBody().physicObject;
-            if (bodyB && fixtureB.IsSensor()) {
+            if (bodyB) {
                 this.checkLeave(fixtureA, bodyA, fixtureB);
                 this.checkLeave(fixtureB, bodyB, fixtureA);
             }
