@@ -28,7 +28,25 @@ class PhysicObject extends Emitter {
             this.origin = [-baseTexture.$width*options.sprite.anchor[0], baseTexture.$height*options.sprite.anchor[1]];
         }
     }
-    static createColor(options) {
+    static createColorLine(colorCount, colorWidth, colorHeight, options) {
+        const width = colorWidth*colorCount,
+              tolerance = options.tolerance || 0.05;
+        options.shape = new box2d.b2PolygonShape().SetAsBox(width, colorHeight);
+        const colorLine = new this(options),
+              position = new box2d.b2Vec2(-width+colorWidth, -tolerance),
+              colorRealWidth = colorWidth*2,
+              newHeight = colorHeight + tolerance;
+        for (let i = 0; i < colorCount; i++) {
+            const fixture = new box2d.b2FixtureDef();
+            fixture.$shape = new box2d.b2PolygonShape().SetAsBox(colorWidth, newHeight, position);
+            fixture.$isSensor = true;
+            fixture.isColor = true;
+            colorLine.fixtures.push(fixture);
+            position.x += colorRealWidth;
+        }
+        return colorLine;
+    }
+    static addColor(options) {
         options.restitution = options.restitution || 0;
         const obj = new this(options);
         obj.isColor = true;

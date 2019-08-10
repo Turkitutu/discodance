@@ -69,7 +69,7 @@ module.exports = class Camera {
                 dx = Math.max(dx, Math.abs(bc.$x-position.x*100)+target.width/2);
                 dy = Math.max(dy, Math.abs(bc.$y-position.y*100)+target.height/2);
             }
-            const zoom = dx/this.app.fullRatio > dy ? this.app.fullWidth*this._scale/(dx*4) : this.app.fullHeight*this._scale/(dy*4);
+            const zoom = dx/this.app.fullRatio > dy ? this.app.fullWidth*this._scale/(dx*2) : this.app.fullHeight*this._scale/(dy*2);
             this.container.$scale.set(zoom);
         }
     }

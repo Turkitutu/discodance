@@ -28,24 +28,15 @@ function construct(resources) {
             x: 13*i,
             y: 4
         }));
-        this.addObject(PhysicObject.createColor({
-            shape: new box2d.b2PolygonShape().SetAsBox(1, 0.15),
-            x: 13*i,
-            y: 1.85
-        }));
-        this.addObject(PhysicObject.createColor({
-            shape: new box2d.b2PolygonShape().SetAsBox(1, 0.15),
-            x: 15*i,
+        this.addObject(PhysicObject.createColorLine(2, 1, 0.15, {
+            x: 14*i,
             y: 1.85
         }));
     }
-    for (let i = -9; i <= 9; i+=2) {
-        this.addObject(PhysicObject.createColor({
-            shape: new box2d.b2PolygonShape().SetAsBox(1, 0.15),
-            x: i,
-            y: 3.85
-        }));
-    }
+    this.addObject(PhysicObject.createColorLine(10, 1, 0.15, {
+        x: 0,
+        y: 3.85
+    }));
 }
 
 module.exports = {

@@ -20,12 +20,25 @@ module.exports = class Player extends PhysicObject {
             fixedRotation: true
         });
         const sensor = new box2d.b2FixtureDef(),
-              sensorSize = 0.04;
-        sensor.$isSensor = true;
-        sensor.$shape = new box2d.b2PolygonShape().SetAsBox(width, sensorSize, new box2d.b2Vec2(0, height-sensorSize));
-        this.fixtures.push(sensor);
-        this.width = width*100;
-        this.height = height*100;
+              rightSide = new box2d.b2FixtureDef(),
+              leftSide = new box2d.b2FixtureDef(),
+              sensorSize = 0.04,
+              halfWidth = width / 2,
+              partHeight = height*3/4,
+              pos = new box2d.b2Vec2(0, height-sensorSize);
+        sensor.$isSensor=rightSide.$isSensor=leftSide.$isSensor=true;
+        sensor.bottom=rightSide.right=leftSide.left=true;
+        sensor.$shape = new box2d.b2PolygonShape().SetAsBox(width-0.03, sensorSize, pos);
+        pos.x = halfWidth;
+        pos.y = height/4;
+        rightSide.$shape = new box2d.b2PolygonShape().SetAsBox(halfWidth, partHeight, pos);
+        pos.x *= -1;
+        leftSide.$shape = new box2d.b2PolygonShape().SetAsBox(halfWidth, partHeight, pos);
+        this.fixtures.push(sensor, rightSide, leftSide);
+        this.left = {};
+        this.right = {};
+        this.width = width*200;
+        this.height = height*200;
         this.movement = [];
         this.direction = -1;
         this.speed = 6;
@@ -34,6 +47,7 @@ module.exports = class Player extends PhysicObject {
         this.impulse = new box2d.b2Vec2();
         this.state = 'breath';
         this.jumps = 0;
+        window.$player = this;
     }
     playAnimation(value) {
         if (this.sprite.$animation.$lastAnimationName !== value) {
@@ -90,13 +104,11 @@ module.exports = class Player extends PhysicObject {
 
         super.update();
     }
-    onColorTouch(color) {
-        this.color = color;
+    onColorTouch() {
+        console.log('new color', this.color);
     }
-    onColorLeave(color) {
-        if (this.color == color) {
-            this.color = null;
-        }
+    onColorLeave() {
+        console.log('no color', this.color);
     }
     onLanding() {
         this.jumps = 0;
