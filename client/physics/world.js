@@ -1,49 +1,9 @@
-const DebugDraw = require('./debug.js');
+const DebugDraw = require('./debug.js'),
+      ContactListener = require('./contact.js');
 
 const TIME_STEP = 1/60,
       VELOCITY_ITERATIONS = 6,
       POSITION_ITERATIONS = 2;
-
-class ContactListener extends box2d.b2ContactListener {
-    constructor() {
-        super();
-    }
-    $BeginContact(contact) {
-        const bodyA = contact.$m_fixtureA.GetBody().physicObject;
-        if (bodyA) {
-            const bodyB = contact.$m_fixtureB.GetBody().physicObject;
-            if (bodyB) {
-                if (bodyA.isPlayer) {
-                    if (contact.$m_fixtureA.IsSensor()) {
-                        bodyA.onLanding();
-                    } else if (bodyB.isColor) {
-                        bodyA.onColorTouch(bodyB);
-                    }
-                }
-                if (bodyB.isPlayer) {
-                    if (contact.$m_fixtureB.IsSensor()) {
-                        bodyB.onLanding();
-                    } else if (bodyA.isColor) {
-                        bodyB.onColorTouch(bodyA);
-                    }
-                }
-            }
-        }
-    }
-    $EndContact(contact) {
-        const bodyA = contact.$m_fixtureA.GetBody().physicObject;
-        if (bodyA) {
-            const bodyB = contact.$m_fixtureB.GetBody().physicObject;
-            if (bodyB) {
-                if (bodyA.isColor && bodyB.isPlayer && !contact.$m_fixtureB.IsSensor()) {
-                    bodyB.onColorLeave(bodyA);
-                } else if (bodyA.isPlayer && bodyB.isColor && !contact.$m_fixtureA.IsSensor()) {
-                    bodyA.onColorLeave(bodyB);
-                }
-            }
-        }
-    }
-}
 
 class GameWorld {
     constructor(options) {
@@ -53,11 +13,22 @@ class GameWorld {
         this.debug.enabled = options.debug;
         this.debug.renderer.$scale.set(100, 100);
         this.b2world.SetContactListener(new ContactListener());
+        this.colors = [];
     }
     add(obj) {
         obj.body = this.b2world.CreateBody(obj.bodyDef);
         for (const fixture of obj.fixtures) {
-            obj.body.CreateFixture(fixture);
+            const fixt = obj.body.CreateFixture(fixture);
+            if (fixture.isColor) {
+                fixt.isColor = true;
+                fixt.colorCode = Math.floor(Math.random()*0xffffff);
+                this.colors.push(fixt);
+            }
+            fixt.bottom = fixture.bottom;
+            fixt.left = fixture.left;
+            fixt.right = fixture.right;
+            fixt.leftWall = fixture.leftWall;
+            fixt.rightWall = fixture.rightWall;
         }
         delete obj.fixtures;
         obj.body.physicObject = obj;
@@ -74,6 +45,7 @@ class GameWorld {
         this.b2world.Step(TIME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
     clear() {
+        this.colors = [];
         //World.$clear(this.engine.$world);
         //Engine.clear(this.engine);
     }

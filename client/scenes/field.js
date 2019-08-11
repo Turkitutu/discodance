@@ -41,7 +41,7 @@ class Field extends Scene {
         this.addChild(this.world.debug.renderer);
 
         this.camera.focus(this.playerList);
-        this.camera.zoom(0.1);
+        this.camera.zoom(0.7);
     }
     update(delta) {
         if (!this.loaded) return;

@@ -19,13 +19,32 @@ module.exports = class Player extends PhysicObject {
             },
             fixedRotation: true
         });
-        const sensor = new box2d.b2FixtureDef(),
-              sensorSize = 0.04;
-        sensor.$isSensor = true;
-        sensor.$shape = new box2d.b2PolygonShape().SetAsBox(width, sensorSize, new box2d.b2Vec2(0, height-sensorSize));
-        this.fixtures.push(sensor);
-        this.width = width*100;
-        this.height = height*100;
+        const rightBottom = new box2d.b2FixtureDef(),
+              leftBottom = new box2d.b2FixtureDef(),
+              rightSide = new box2d.b2FixtureDef(),
+              leftSide = new box2d.b2FixtureDef(),
+              sensorSize = 0.04,
+              sideSize = 0.01,
+              sensorWidth = width/2-0.02,
+              partHeight = height/2,
+              pos = new box2d.b2Vec2(sensorWidth, height+sensorSize);
+        leftBottom.$isSensor=rightBottom.$isSensor=rightSide.$isSensor=leftSide.$isSensor=true;
+        leftBottom.bottom=rightBottom.bottom=leftBottom.left=rightBottom.right=rightSide.rightWall=leftSide.leftWall=true;
+        rightBottom.$shape = new box2d.b2PolygonShape().SetAsBox(sensorWidth, sensorSize, pos);
+        pos.x *= -1;
+        leftBottom.$shape = new box2d.b2PolygonShape().SetAsBox(sensorWidth, sensorSize, pos);
+        pos.x = width;
+        pos.y = 0;
+        rightSide.$shape = new box2d.b2PolygonShape().SetAsBox(sideSize, partHeight, pos);
+        pos.x *= -1;
+        leftSide.$shape = new box2d.b2PolygonShape().SetAsBox(sideSize, partHeight, pos);
+        this.fixtures.push(rightBottom, leftBottom, rightSide, leftSide);
+        this.left = {};
+        this.right = {};
+        this.bottom = 0;
+        this.sliding = false;
+        this.width = width*200;
+        this.height = height*200;
         this.movement = [];
         this.direction = -1;
         this.speed = 6;
@@ -34,6 +53,7 @@ module.exports = class Player extends PhysicObject {
         this.impulse = new box2d.b2Vec2();
         this.state = 'breath';
         this.jumps = 0;
+        window.$player = this;
     }
     playAnimation(value) {
         if (this.sprite.$animation.$lastAnimationName !== value) {
@@ -90,17 +110,21 @@ module.exports = class Player extends PhysicObject {
 
         super.update();
     }
-    onColorTouch(color) {
-        this.color = color;
+    onColorTouch() {
+        console.log('new color', this.color);
     }
-    onColorLeave(color) {
-        if (this.color == color) {
-            this.color = null;
-        }
+    onColorLeave() {
+        console.log('no color', this.color);
     }
     onLanding() {
         this.jumps = 0;
         this.state = '';
+    }
+    onSlide() {
+        console.log('sliding');
+    }
+    onSlideLeave() {
+        console.log('not sliding');
     }
     static handleMoves(input) {
         return [input.keyDown.right > input.keyDown.left, input.keyDown.right < input.keyDown.left, input.wasModified.up && input.keyDown.up];
