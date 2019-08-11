@@ -51,6 +51,7 @@ Box2D.b2World = Box2D.$b2World;
 Box2D.b2World.prototype.SetContactListener = Box2D.b2World.prototype.$SetContactListener;
 Box2D.b2World.prototype.SetDebugDraw = Box2D.b2World.prototype.$SetDebugDraw;
 Box2D.b2World.prototype.CreateBody = Box2D.b2World.prototype.$CreateBody;
+Box2D.b2World.prototype.DestroyBody = Box2D.b2World.prototype.$DestroyBody;
 Box2D.b2World.prototype.Step = Box2D.b2World.prototype.$Step;
 Box2D.b2World.prototype.DrawDebugData = Box2D.b2World.prototype.$DrawDebugData;
 Box2D.b2_pi = Box2D.$b2_pi;

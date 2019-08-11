@@ -38,7 +38,7 @@ module.exports = class Connection {
                 if (this.incoming[cog]) {
                     const packet_id = this.incoming[cog].special 
                                     ? this.incoming[cog].special(data)
-                                    : data.readUInt();
+                                    : data.getSpecialByte(1);
                     if (this.incoming[cog].packets[packet_id]) {
                         this.incoming[cog].packets[packet_id](data);
                     }

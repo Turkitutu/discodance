@@ -20,8 +20,9 @@ module.exports = class login extends Scene {
 
     update(delta){
         if (this.input.keyDown.enter) {
-            this.world.fieldId = 0;
-            this.scenes.field.play();
+            //this.world.fieldId = 0;
+            //this.scenes.field.play();
+            this.scenes.village.play();
             this.disable();
         }
     }

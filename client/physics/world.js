@@ -62,6 +62,10 @@ class GameWorld {
         delete obj.fixtures;
         obj.body.physicObject = obj;
     }
+    remove(obj) {
+        this.b2world.DestroyBody(obj.body);
+        delete obj.body;
+    }
     update(delta) {
         if (this.debug.enabled) {
             this.debug.clear();

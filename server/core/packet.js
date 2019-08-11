@@ -1,9 +1,13 @@
 const ByteArray = require("../../shared/bytearray.js");
 
 class Packet {
-    constructor(message, player) {
+    constructor(player, message) {
         this.player = player;
-        this.read(message);
+        if (message){
+            this.read(message);
+        }else{
+            this.data = new ByteArray();
+        }
     }
     setData(byteArray) {
         this.data = byteArray;
@@ -12,10 +16,11 @@ class Packet {
     setCog(id) {
         this.cogId = id;
         this.writeCog();
+        return this
     }
     writeCog() {
-        const offset = this.data.writeOffset || 2;
-        this.data.writeOffset = 1;
+        const offset = this.data.writeOffset || 1;
+        this.data.writeOffset = 0;
         this.data.writeUInt(this.cogId);
         this.data.writeOffset = offset;
     }
@@ -24,19 +29,29 @@ class Packet {
         this.cogId = this.data.readUInt();
     }
     send() {
-        this.player.socket.send(this.data.buffer);
+        const data = this.data.buffer;
+        this.player.socket.send(data);
     }
     broadcast(type) {
         const buffer = this.data.buffer;
+        var players;
         switch (type) {
             case 'ALL': 
-                for (const player of this.player.server.players) {
-                    player.socket.send(buffer);
+                players = this.player.server.players;
+                for (const id of Object.keys(players)) {
+                    players[id].socket.send(buffer);
                 }
                 break;
             case 'ROOM':
-                for (const player of this.player.room.players) {
-                    player.socket.send(buffer);
+                players = this.player.room.players;
+                for (const id of Object.keys(players)) {
+                    players[id].socket.send(buffer);
+                }
+                break;
+            case 'ROOM_OTHERS':
+                players = this.player.room.players;
+                for (const id of Object.keys(players)) {
+                    if (players[id].id != this.player.id) players[id].socket.send(buffer);
                 }
                 break;
         }
