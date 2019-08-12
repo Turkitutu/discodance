@@ -229,17 +229,3 @@ class ByteArray {
 }
 
 module.exports = ByteArray;
-
-/*/
-p = new ByteArray();
-console.log(p.data)
-
-p.writeUInt(2);
-console.log(p.data)
-p.setSpecialByte(2, 2);
-console.log(p.data)
-p.writeUInt(1);
-console.log(p.data)
-
-console.log(Buffer.from(p.buffer))
-/*/

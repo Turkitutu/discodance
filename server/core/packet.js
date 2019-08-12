@@ -29,8 +29,7 @@ class Packet {
         this.cogId = this.data.readUInt();
     }
     send() {
-        const data = this.data.buffer;
-        this.player.socket.send(data);
+        this.player.socket.send(this.data.buffer);
     }
     broadcast(type) {
         const buffer = this.data.buffer;
