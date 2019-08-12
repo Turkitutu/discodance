@@ -1,4 +1,4 @@
 {
-    "0" : "on_player_joined",
-    "1" : "on_player_moves"
+    "0" : "on_player_join",
+    "1" : "on_player_movement"
 }

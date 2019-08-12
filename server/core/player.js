@@ -9,6 +9,12 @@ class Player {
         this.lastHeartbeat = 0;
         this.ping = 0;
         this._heartbeat = true;
+        this.x = 0;
+        this.y = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.jumps = 0;
+        this.direction = 1
         ws.on("pong", () => {
             this._heartbeat = true;
             this.ping = Date.now() - this.lastHeartbeat;

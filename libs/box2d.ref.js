@@ -19,6 +19,7 @@ Box2D.b2BodyType.b2_dynamicBody = Box2D.b2BodyType.$b2_dynamicBody;
 Box2D.b2Body = Box2D.$b2Body;
 Box2D.b2Body.prototype.CreateFixture = Box2D.b2Body.prototype.$CreateFixture;
 Box2D.b2Body.prototype.GetPosition = Box2D.b2Body.prototype.$GetPosition;
+Box2D.b2Body.prototype.SetPosition = Box2D.b2Body.prototype.$SetPosition;
 Box2D.b2Body.prototype.GetAngle = Box2D.b2Body.prototype.$GetAngle;
 Box2D.b2Body.prototype.SetLinearVelocity = Box2D.b2Body.prototype.$SetLinearVelocity;
 Box2D.b2Body.prototype.GetLinearVelocity = Box2D.b2Body.prototype.$GetLinearVelocity;

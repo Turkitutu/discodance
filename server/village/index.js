@@ -14,16 +14,23 @@ class Village extends Cog {
         packet.data.setSpecialByte(this.outgoing[packetName], 2);
     }
 
-    on_player_joined(packet) {
+    on_player_join(packet) {
         packet.player.server.village.addPlayer(packet.player);
-        packet.player.x = 0;
-        packet.player.y = 0;
+        packet.player.x = 0; // village's x respawn point
+        packet.player.y = 0; // village's y respawn point
         this.send_player_list(packet);
         this.send_new_player(packet);
     }
 
-    on_player_moves(packet) {
-        // read
+    on_player_movement(packet) {
+        const player = packet.player;
+        player.direction = packet.data.readInt();
+        player.jumps = packet.data.readUInt();
+        player.x = packet.data.readInt();
+        player.y = packet.data.readInt();
+        player.vx = packet.data.readInt();
+        player.vy = packet.data.readInt();
+        this.send_movement(packet, player.direction, player.jumps, player.x, player.y, player.vx, player.vy);
     }
 
     send_player_list(packet) {
@@ -60,9 +67,16 @@ class Village extends Cog {
         packet.broadcast('ROOM_OTHERS');
     }
 
-    send_movement(packet) {
+    send_movement(packet, direction, jumps, x, y, vx, vy) {
+        packet.setData(new ByteArray());
         this.write('send_movement', packet);
-        // write
+        packet.data.writeUInt(packet.player.id);
+        packet.data.writeInt(direction);
+        packet.data.writeUInt(jumps);
+        packet.data.writeInt(x);
+        packet.data.writeInt(y);
+        packet.data.writeInt(vx);
+        packet.data.writeInt(vy);
         packet.broadcast('ROOM_OTHERS');
     }
 

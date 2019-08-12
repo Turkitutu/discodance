@@ -9,6 +9,7 @@ class Village extends Scene {
         this.playerList = [];
         this.loaded = false;
         this.checkTime = 0;
+        this.lastMovement = [];
 
         this.connection.use(incoming, cogs.village.id, (packet) => {
             return packet.getSpecialByte(2);
@@ -25,6 +26,7 @@ class Village extends Scene {
                   x = packet.readInt(),
                   y = packet.readInt();
             this.player = new Player([x, y]);
+            this.lastMovement = [x, y];
             this.addPlayer(this.player);
             this.camera.focus([this.player]);
             this.camera.zoom(0.1);
@@ -52,14 +54,29 @@ class Village extends Scene {
             const id = packet.readUInt();
             this.removePlayer(id);
         });
-        this.connection.packet(outgoing, cogs.village.id, cogs.village.send_movement, (packet, moving, direction, isJumping, x, y, vx, vy) => {
-            packet.writeBoolean(moving);
-            packet.writeBoolean(direction == -1 ? false : true);
+        this.connection.packet(outgoing, cogs.village.id, cogs.village.send_movement, (packet, direction, jumps, x, y, vx, vy) => {
+            packet.writeInt(direction);
             packet.writeUInt(jumps);
             packet.writeInt(x);
             packet.writeInt(y);
             packet.writeInt(vx);
             packet.writeInt(vy);
+        });
+        this.connection.packet(incoming, cogs.village.id, cogs.village.on_player_movement, (packet) => {
+            const player = this.getPlayer(packet.readUInt());
+            const jumps = packet.readUInt(); // soon
+            const direction = packet.readInt();
+            player.sprite.$scale.$x *= direction;
+            player.direction = direction;
+            const x = packet.readInt()/100;
+            const y = packet.readInt()/100;
+            const vx = packet.readInt()/100;
+            const vy = packet.readInt()/100;
+            const vel = player.body.GetLinearVelocity();
+            vel.x = vx;
+            vel.y = vy;
+            player.body.SetLinearVelocity(vel);
+            if (vel.x == 0 || vel.y == 0) player.body.SetPosition(new box2d.b2Vec2(x, y));
         });
     }
 
@@ -80,6 +97,22 @@ class Village extends Scene {
         }));
         this.connection.send(cogs.village.id, cogs.village.send_join);
     }
+    checkMovement() {
+        const pos = this.player.body.GetPosition();
+        const vel = this.player.body.GetLinearVelocity();
+        //if (lastMovement[0] != pos.$x || lastMovement[1] != pos.$y){
+            this.connection.send(cogs.village.id, cogs.village.send_movement, 
+                this.player.direction,
+                this.player.jumps,
+                Math.round(pos.$x*100),
+                Math.round(pos.$y*100),
+                Math.round(vel.x*100),
+                Math.round(vel.y*100)
+            );
+            //this.lastMovement = [pos.$x, pos.$y];
+        //}
+
+    }
     update(delta) {
         if (!this.loaded) return;
 
@@ -90,15 +123,12 @@ class Village extends Scene {
         }
 
         this.world.update(delta);
-        this.checkTime ++;
+        this.checkTime++;
         if (this.checkTime == 2){
             this.checkTime = 0;
-            if (x != this.player.sprite.position.x) {
-                this.connection.send(cogs.village.id, cogs.village.send_movement, 
-            );
-            }
-                
+            this.checkMovement()
         }
+
     }
     disable() {
         this.world.clear();

@@ -2,5 +2,5 @@
     "send_player_list": 0,
     "send_new_player" : 1,
     "send_player_left" : 2,
-    "send_movement" : 3,
+    "send_movement" : 3
 }
