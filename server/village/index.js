@@ -23,14 +23,8 @@ class Village extends Cog {
     }
 
     on_player_movement(packet) {
-        const player = packet.player;
-        player.direction = packet.data.readInt();
-        player.jumps = packet.data.readUInt();
-        player.x = packet.data.readInt();
-        player.y = packet.data.readInt();
-        player.vx = packet.data.readInt();
-        player.vy = packet.data.readInt();
-        this.send_movement(packet, player.direction, player.jumps, player.x, player.y, player.vx, player.vy);
+        packet.player.state = packet.data.readBytes(1);
+        this.send_movement(packet);
     }
 
     send_player_list(packet) {
@@ -67,16 +61,11 @@ class Village extends Cog {
         packet.broadcast('ROOM_OTHERS');
     }
 
-    send_movement(packet, direction, jumps, x, y, vx, vy) {
+    send_movement(packet) {
         packet.setData(new ByteArray());
         this.write('send_movement', packet);
         packet.data.writeUInt(packet.player.id);
-        packet.data.writeInt(direction);
-        packet.data.writeUInt(jumps);
-        packet.data.writeInt(x);
-        packet.data.writeInt(y);
-        packet.data.writeInt(vx);
-        packet.data.writeInt(vy);
+        packet.data.writeBytes(packet.player.state, 1);
         packet.broadcast('ROOM_OTHERS');
     }
 

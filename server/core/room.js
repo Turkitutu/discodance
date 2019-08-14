@@ -23,6 +23,7 @@ class Room {
         if (this.isVillage) { 
             const packet = new Packet(player).setCog(2);
             player.server.cogs[2].send_player_left(packet)
+            delete this.players[player.id];
         }
     }
 }

@@ -21,6 +21,8 @@ const app = new PIXI.Application({
     $resolution: window.$devicePixelRatio || 1
 });
 
+var accumulator = 0;
+
 app.width = 2560;
 app.height = 1440;
 SystemUI.app = app;
@@ -48,8 +50,14 @@ keyboard.batchRegister(keysDefault);
 const sceneManager = new SceneManager(app, connection, world, camera, keyboard);
 
 app.ticker.add(delta => {
-    sceneManager.update(delta);
-    camera.update();
-    //last thing
-    keyboard.update();
+    accumulator += Math.min(delta, 15);
+    while (accumulator >= 1) {
+        sceneManager.update();
+        camera.update();
+        
+        //last thing
+        keyboard.update();
+
+        accumulator -= 1;
+    }
 });

@@ -10,7 +10,7 @@ class ByteArray {
         this.currentBool = {
             readOffset : 0,
             writeOffset : 0,
-            readPos : 0,
+            readPos : 8,
             writePos : 8
         }
         if (buf instanceof Buffer) {
