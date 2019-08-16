@@ -5,7 +5,7 @@ SystemUI.components = components;
 
 const defaultOptions = {
 	size: {},
-	pos: {}
+	position: {}
 }
 
 class customTransform extends PIXI.TransformStatic {
@@ -37,6 +37,7 @@ SystemUI.Component = class extends PIXI.DisplayObject {
 	show() {
 		document.$body.$appendChild(this.dom);
 		this.$visible = true;
+		this.update();
 	}
 	hide() {
 		this.dom.$remove();
@@ -80,10 +81,9 @@ SystemUI.Component = class extends PIXI.DisplayObject {
 		for (const [attr, value] of Object.entries(this.attrs)) {
 			this.dom.$setAttribute(attr, value);
 		}
-		this.show();
-		this.update();
 	}
 	update() {
+		if (!this.$visible) return;
 		const app = SystemUI.app,
 			  element = this.dom,
 			  scale = app.$stage.$scale.$x,

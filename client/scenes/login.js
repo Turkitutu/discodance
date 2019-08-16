@@ -9,6 +9,10 @@ module.exports = class login extends Scene {
 
     play() {
         const resources = PIXI.loaders.shared.resources;
+        
+        const a=new SystemUI.Popup({position: {x: 50, y: 50}, size: {w: 300, max: {h: 500}}});
+        this.camera.center(a);
+        a.show();
 
         var logo = new PIXI.Sprite(resources.$logo_splash.$texture);
         logo.$scale.set(2, 2);

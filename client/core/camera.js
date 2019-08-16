@@ -93,12 +93,12 @@ module.exports = class Camera {
                 app.fullWidth = app.height*app.fullRatio;
                 app.fullHeight = app.height;
             }
+            app.$stage.$scale.set(scale, scale);
             for (const component of components) {
                 if (component.$visible && component.dom) {
                     component.update();
                 }
             }
-            app.$stage.$scale.set(scale, scale);
         }
 
         app.ratio = app.width/app.height;

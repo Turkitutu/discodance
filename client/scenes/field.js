@@ -1,13 +1,52 @@
 const Scene = require('../core/scene.js'),
       PhysicObject = require('../physics/object.js'),
       Player = require('../physics/player.js'),
-      fields = require('../fields/');
+      fields = require('../fields/'),
+      {incoming, outgoing, cogs:{field}} = require('../utils/enums.js');
 
 class Field extends Scene {
     constructor() {
         super();
         this.reset();
         fields.forEach(field => field.construct = field.construct.bind(this));
+        this.playerList = {};
+        this.loaded = false;
+        this.sendingFrame = false;
+        this.index = null;
+
+        /*this.connection.packet(incoming, field.id, field.on_player_list, packet => {
+            // This is the player list of field received from the server
+            const id = packet.readUInt();
+            this.player = new Player([0, 0]);
+            this.addPlayer(id, this.player);
+            this.camera.focus([this.player]);
+            this.camera.zoom(0.1);
+
+            while (packet.bytesAvailable > 0) {
+                this.addPlayer(packet.readUInt(), new Player([0, 0]));
+            }
+
+            this.loaded = true;
+        });
+        this.connection.packet(incoming, field.id, field.on_new_player, packet => {
+            // When a new player joins the field
+            const id = packet.readUInt(),
+                  player = new Player([0, 0]);
+            this.addPlayer(id, player);
+            this.player.prevData = null;
+        });
+        this.connection.packet(incoming, field.id, field.on_player_left, packet => {
+            // When a player leaves the field
+            const id = packet.readUInt();
+            this.removePlayer(id);
+        });
+        this.connection.packet(outgoing, field.id, field.send_movement, packet => {
+            this.player.writePacket(packet);
+        });
+        this.connection.packet(incoming, field.id, field.on_player_movement, packet => {
+            const player = this.playerList[packet.readUInt()];
+            player.readPacket(packet);
+        });*/
     }
     reset() {
         this.playerList = [];
