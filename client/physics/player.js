@@ -1,11 +1,14 @@
 const PhysicObject = require('./object.js');
 
-const states = {
-    breath: 1,
-    run: 2,
-    jump: 3,
-    jumpForward: 4
-}
+const { round } = Math;
+
+const vec2 = new box2d.b2Vec2(),
+      states = {
+        breath: 1,
+        run: 2,
+        jump: 3,
+        jumpForward: 4
+      }
 
 module.exports = class Player extends PhysicObject {
     constructor(position/*, skin/clothes(?)*/) {
@@ -47,6 +50,10 @@ module.exports = class Player extends PhysicObject {
         pos.x *= -1;
         leftSide.$shape = new box2d.b2PolygonShape().SetAsBox(sideSize, partHeight, pos);
         this.fixtures.push(rightBottom, leftBottom, rightSide, leftSide);
+        for (const fixture of this.fixtures) {
+            fixture.filter.$categoryBits = 2;
+            fixture.filter.$maskBits = ~2;
+        }
         this.left = {};
         this.right = {};
         this.bottom = 0;
@@ -164,11 +171,17 @@ module.exports = class Player extends PhysicObject {
         }
     }
     hasChanged() {
-        return !this.prevData || this.prevData[0] != this.state || this.prevData[1] != this.sendJumping || this.prevData[2] != this.nextDirection;
+        return !this.prevData
+        || this.body.IsAwake() && (this.state == states.breath || this.state == states.jump)
+        || this.prevData[0] != this.state 
+        || this.prevData[1] != this.sendJumping 
+        || this.prevData[2] != this.nextDirection;
     }
     writePacket(packet) {
+        const pos = this.body.GetPosition(),
+              vel = this.body.GetLinearVelocity();
         let state = this.state;
-        this.prevData = [state, this.sendJumping, this.nextDirection];
+        this.prevData = [state, this.sendJumping, this.nextDirection]
         if (this.sendJumping) {
             state |= 128;
             this.sendJumping = false;
@@ -176,13 +189,22 @@ module.exports = class Player extends PhysicObject {
         if (this.nextDirection == 1) {
             state |= 64;
         }
-        packet.writeBytes(state, 1);
+        packet
+        .writeBytes(state, 1)
+        .writeInt(round(pos.x*100))
+        .writeInt(round(pos.y*100))
+        .writeInt(round(vel.x*100))
+        .writeInt(round(vel.y*100));
     }
     readPacket(packet) {
         const state = packet.readBytes(1);
         this.hasJumped = state >> 7;
         this.nextDirection = ((state >> 6) & 1) || -1;
         this.state = state & 63;
+        vec2.Set(packet.readInt()/100, packet.readInt()/100);
+        this.body.SetPosition(vec2);
+        vec2.Set(packet.readInt()/100, packet.readInt()/100);
+        this.body.SetLinearVelocity(vec2);
         //TODO: read x, y, vx, vy : correct mistakes or report hacker
     }
 }

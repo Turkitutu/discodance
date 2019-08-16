@@ -16,35 +16,40 @@ class Village extends Cog {
 
     on_player_join(packet) {
         packet.player.server.village.addPlayer(packet.player);
-        packet.player.x = 0; // village's x respawn point
-        packet.player.y = 0; // village's y respawn point
         this.send_player_list(packet);
         this.send_new_player(packet);
     }
 
     on_player_movement(packet) {
-        packet.player.state = packet.data.readBytes(1);
-        this.send_movement(packet);
+        const state = packet.data.readBytes(1),
+              x = packet.data.readInt(),
+              y = packet.data.readInt(),
+              vx = packet.data.readInt(),
+              vy = packet.data.readInt();
+
+        packet.setData(new ByteArray());
+        this.write('send_movement', packet);
+
+        packet.data
+        .writeUInt(packet.player.id)
+        .writeBytes(state, 1)
+        .writeInt(x)
+        .writeInt(y)
+        .writeInt(vx)
+        .writeInt(vy);
+
+        packet.broadcast('ROOM_OTHERS');
     }
 
     send_player_list(packet) {
         packet.setData(new ByteArray());
         this.write('send_player_list', packet);
-
         packet.data.writeUInt(packet.player.id);
-        packet.data.writeInt(packet.player.x);
-        packet.data.writeInt(packet.player.y);
-
-        const players = packet.player.room.players;
-        packet.data.writeUInt(Object.keys(players).length-1);
-        for (const id of Object.keys(players)) {
+        for (const id in packet.player.server.village.players) {
             if (id != packet.player.id) {
                 packet.data.writeUInt(id);
-                packet.data.writeInt(players[id].x);
-                packet.data.writeInt(players[id].y);
             }
         }
-
         packet.send();
     }
 
@@ -60,15 +65,6 @@ class Village extends Cog {
         packet.data.writeUInt(packet.player.id);
         packet.broadcast('ROOM_OTHERS');
     }
-
-    send_movement(packet) {
-        packet.setData(new ByteArray());
-        this.write('send_movement', packet);
-        packet.data.writeUInt(packet.player.id);
-        packet.data.writeBytes(packet.player.state, 1);
-        packet.broadcast('ROOM_OTHERS');
-    }
-
 }
 
 module.exports = Village;

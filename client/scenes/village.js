@@ -1,6 +1,6 @@
 const Scene = require('../core/scene.js'),
       PhysicObject = require('../physics/object.js'),
-      {incoming, outgoing, cogs} = require('../utils/enums.js'),
+      {incoming, outgoing, cogs:{village}} = require('../utils/enums.js'),
       Player = require('../physics/player.js');
 
 class Village extends Scene {
@@ -9,51 +9,47 @@ class Village extends Scene {
         this.playerList = {};
         this.loaded = false;
         this.sendingFrame = false;
+        this.index = null;
 
-        this.connection.use(incoming, cogs.village.id, (packet) => {
+        this.connection.use(incoming, village.id, (packet) => {
             return packet.getSpecialByte(2);
         });
-        this.connection.use(outgoing, cogs.village.id, (id, packet) => {
+        this.connection.use(outgoing, village.id, (id, packet) => {
             packet.setSpecialByte(id, 2);
         });
-        this.connection.packet(outgoing, cogs.village.id, cogs.village.send_join, packet => {
+        this.connection.packet(outgoing, village.id, village.send_join, packet => {
             // Sends a request to join the village
         });
-        this.connection.packet(incoming, cogs.village.id, cogs.village.on_player_list, packet => {
+        this.connection.packet(incoming, village.id, village.on_player_list, packet => {
             // This is the player list of village received from the server
-            const id = packet.readUInt(),
-                  x = packet.readInt(),
-                  y = packet.readInt();
-            this.player = new Player([x, y]);
+            const id = packet.readUInt();
+            this.player = new Player([0, 0]);
             this.addPlayer(id, this.player);
             this.camera.focus([this.player]);
             this.camera.zoom(0.1);
 
-            const n = packet.readUInt();
-            for(let i = 0; i < n; i++){
-                const _id = packet.readUInt(),
-                      _x = packet.readInt(),
-                      _y = packet.readInt();
-                const player = new Player([_x, _y]);
-                this.addPlayer(_id, player);
+            while (packet.bytesAvailable > 0) {
+                this.addPlayer(packet.readUInt(), new Player([0, 0]));
             }
+
             this.loaded = true;
         });
-        this.connection.packet(incoming, cogs.village.id, cogs.village.on_new_player, packet => {
+        this.connection.packet(incoming, village.id, village.on_new_player, packet => {
             // When a new player joins the village
-            const id = packet.readUInt();
-            const player = new Player([0, 0]);
+            const id = packet.readUInt(),
+                  player = new Player([0, 0]);
             this.addPlayer(id, player);
+            this.player.prevData = null;
         });
-        this.connection.packet(incoming, cogs.village.id, cogs.village.on_player_left, packet => {
+        this.connection.packet(incoming, village.id, village.on_player_left, packet => {
             // When a player leaves the village
             const id = packet.readUInt();
             this.removePlayer(id);
         });
-        this.connection.packet(outgoing, cogs.village.id, cogs.village.send_movement, packet => {
+        this.connection.packet(outgoing, village.id, village.send_movement, packet => {
             this.player.writePacket(packet);
         });
-        this.connection.packet(incoming, cogs.village.id, cogs.village.on_player_movement, packet => {
+        this.connection.packet(incoming, village.id, village.on_player_movement, packet => {
             const player = this.playerList[packet.readUInt()];
             player.readPacket(packet);
         });
@@ -68,15 +64,15 @@ class Village extends Scene {
 
         this.enable();
 
-
         this.addObject(new PhysicObject({
             shape: new box2d.b2PolygonShape().SetAsBox(20, 0.5),
             x: 0,
             y: 5
         }));
-        this.connection.send(cogs.village.id, cogs.village.send_join);
+
+        this.connection.send(village.id, village.send_join);
     }
-    update(delta) {
+    update() {
         if (!this.loaded) return;
 
         const length = this.player.readInput(this.input);
@@ -85,11 +81,12 @@ class Village extends Scene {
             this.playerList[id].update();
         }
 
-        this.world.update(delta);
+        this.world.update();
+
         this.sendingFrame = !this.sendingFrame;
         if (this.sendingFrame) {
             if (this.player.hasChanged()) {
-                this.connection.send(cogs.village.id, cogs.village.send_movement);
+                this.connection.send(village.id, village.send_movement);
             }
         }
     }
@@ -104,6 +101,12 @@ class Village extends Scene {
     addPlayer(id, player) {
         this.addObject(player);
         this.playerList[id] = player;
+        if (this.index === null) {
+            this.index = this.$children.indexOf(this.player.sprite);
+        }
+        this.$children[this.index] = player.sprite;
+        this.index = this.$children.length-1;
+        this.$children[this.index] = this.player.sprite;
     }
     addObject(obj) {
         this.world.add(obj);

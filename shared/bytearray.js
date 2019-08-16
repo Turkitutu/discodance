@@ -41,6 +41,7 @@ class ByteArray {
             this.data.writeUIntBE(int, this.writeOffset, length);
             this.writeOffset += length;
         }
+        return this;
     }
 
     writeUInt(int) {
@@ -167,10 +168,14 @@ class ByteArray {
         return !!(1 & (this.data[this.currentBool.readOffset] >> this.currentBool.readPos++));
     }
 
+    extend(size) {
+        this._buffer = Buffer.concat([this._buffer, Buffer.alloc(size)]);
+        this.data = this._buffer.slice(4);
+    }
+
     checkSize(length) {
         if (this.writeOffset+length > this.data.length){
-            this._buffer = Buffer.concat([this._buffer, Buffer.alloc(Math.ceil((this.writeOffset+length-this.data.length)/this.defaultSize)*this.defaultSize)]);
-            this.data = this._buffer.slice(4);
+            this.extend(Math.ceil((this.writeOffset+length-this.data.length)/this.defaultSize)*this.defaultSize)
         }
     }
 
@@ -185,7 +190,7 @@ class ByteArray {
     }
 
     get bytesAvailable() {
-        return this.writeOffset - this.readOffset;
+        return this.readOffset > this.specialOffset ? this.writeOffset - this.readOffset : this.writeOffset - this.readOffset - 1;
     }
 
     setSpecialByte(byte, pos){

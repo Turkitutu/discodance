@@ -36,6 +36,7 @@ Object.defineProperty(Pixi.DisplayObject.prototype, "y", Object.getOwnPropertyDe
 Object.defineProperty(Pixi.DisplayObject.prototype, "position", Object.getOwnPropertyDescriptor(Pixi.DisplayObject.prototype, "position"));
 Object.defineProperty(Pixi.DisplayObject.prototype, "scale", Object.getOwnPropertyDescriptor(Pixi.DisplayObject.prototype, "scale"));
 Object.defineProperty(Pixi.DisplayObject.prototype, "rotation", Object.getOwnPropertyDescriptor(Pixi.DisplayObject.prototype, "rotation"));
+Object.defineProperty(Pixi.DisplayObject.prototype, "mask", Object.getOwnPropertyDescriptor(Pixi.DisplayObject.prototype, "mask"));
 Pixi.DisplayObject.prototype.cursor = Pixi.DisplayObject.prototype.$cursor;
 Object.defineProperty(Pixi, "Container", Object.getOwnPropertyDescriptor(Pixi, "Container"));
 Pixi.Container.prototype.addChild = Pixi.Container.prototype.$addChild;
