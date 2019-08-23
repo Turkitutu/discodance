@@ -94,10 +94,8 @@ module.exports = class Camera {
                 app.fullHeight = app.height;
             }
             app.$stage.$scale.set(scale, scale);
-            for (const component of components) {
-                if (component.$visible && component.dom) {
-                    component.update();
-                }
+            for (const component in EZGUI.components) {
+                EZGUI.components[component].rebuild();
             }
         }
 

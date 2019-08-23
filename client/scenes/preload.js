@@ -41,10 +41,26 @@ module.exports = class preload extends Scene {
             bar_inner.$texture.frame = rect;
             this.addChild(bar_inner);
             loader
-            .add("character", "assets/character_ske.json")
-            .add("character_info", "assets/character_tex.json")
-            .add("character_tex", "assets/character_tex.png")
+            .add("discodancer", "assets/discodancer_ske.dbbin", { $xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE﻿﻿.BUFFER })
+            .add("discodancer_info", "assets/discodancer_tex.json")
+            .add("discodancer_tex", "assets/discodancer_tex.png")
             .add("logo_splash", "assets/splash.png")
+            .add("metalworks_theme", "assets/metalworks-theme.json")
+            .add([
+                "assets/header-bg.png",
+                "assets/bg.png",
+                "assets/bg-down.png",
+                "assets/btn-bg.png",
+                "assets/btn-bg-down.png",
+                "assets/btn-corner.png",
+                "assets/btn-line.png",
+                "assets/darkcnt-corner.png",
+                "assets/darkcnt-line.png",
+                "assets/corner.png",
+                "assets/line.png",
+                "assets/chk-checkmark.png",
+                "assets/radio-checkmark.png"
+            ])
             .on("progress", loader => {
                 rect.$width = loader.$progress*bar_inner.$texture.$baseTexture.$width/100;
                 bar_inner.$texture.frame = rect;
@@ -52,13 +68,15 @@ module.exports = class preload extends Scene {
             })
             .load((loader, resources) => {
                 const factory = dragonBones.PixiFactory.factory;
-                factory.parseDragonBonesData(resources.$character.$data);
-                factory.parseTextureAtlasData(resources.$character_info.$data, resources.$character_tex.$texture);
+                factory.parseDragonBonesData(resources.$discodancer.$data);
+                factory.parseTextureAtlasData(resources.$discodancer_info.$data, resources.$discodancer_tex.$texture);
                 this.connection.connect("localhost", 1661);
-                const text = new PIXI.Text('Connecting to server ...',{fontFamily : 'Tahoma', fontSize: 24, fill : 0xffffff, align : 'center'});
+                const text = new PIXI.Text('Connecting to server ...',{$fontFamily : 'Tahoma', $fontSize: 24, $fill : 0xffffff, $align : 'center'});
                 text.$position.set(-text.$width/2, 100);
                 this.addChild(text);
-                this.loaded = true;
+                EZGUI.Theme.load([resources.$metalworks_theme.$data], () => {
+                    this.loaded = true;
+                });
             });
         });
 

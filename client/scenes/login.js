@@ -1,6 +1,5 @@
 const Scene = require('../core/scene.js'),
-      { cogs } = require('../utils/enums.js'),
-      SystemUI = require('../core/system-ui.js');
+      { cogs } = require('../utils/enums.js');
 
 module.exports = class login extends Scene {
     constructor() {
@@ -9,15 +8,34 @@ module.exports = class login extends Scene {
 
     play() {
         const resources = PIXI.loaders.shared.resources;
-        
-        const a=new SystemUI.Popup({position: {x: 50, y: 50}, size: {w: 300, max: {h: 500}}});
-        this.camera.center(a);
-        a.show();
 
-        var logo = new PIXI.Sprite(resources.$logo_splash.$texture);
+        const logo = new PIXI.Sprite(resources.$logo_splash.$texture);
         logo.$scale.set(2, 2);
         logo.$position.set(-logo.$width/2, -700);
         this.addChild(logo);
+
+        const mainScreen = EZGUI.create({
+            $id: 'myWindow',
+            $component: 'Window',
+            $header: { $position: { $x: 0, $y: 0 }, $height: 80, $text: 'Header' },
+            $draggable: true,
+            $position: { $x: 0, $y: 0 },
+            $width: 1000,
+            $height: 500, 
+            $layout: [1, 3],
+            $children: [
+                null,
+                {
+                    $id: 'button1',
+                    $component: 'Button',
+                    $position: 'center',
+                    $text: 'Click Me',
+                    $width: 400,
+                    $height: 160
+                }
+            ]
+        }, 'metalworks');
+        this.addChild(mainScreen);
 
         this.enable();
     }

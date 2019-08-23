@@ -26,7 +26,7 @@ class Village extends Scene {
             this.player = new Player([0, 0]);
             this.addPlayer(id, this.player);
             this.camera.focus([this.player]);
-            this.camera.zoom(0.1);
+            this.camera.zoom(0.4);
 
             while (packet.bytesAvailable > 0) {
                 this.addPlayer(packet.readUInt(), new Player([0, 0]));
@@ -119,7 +119,8 @@ class Village extends Scene {
     removeObject(obj) {
         this.world.remove(obj);
         if (obj.sprite){
-            this.removeChild(obj.sprite);
+            obj.sprite.destroy(false);
+            this.index = null;
         }
     }
 }

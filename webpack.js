@@ -7,7 +7,7 @@ const webpack = require('webpack'),
 
 require('dotenv').config();
 
-var mustInclude = ['Ticker', 'ObservablePoint', 'Loader', 'BaseFactory', 'Animation', 'b2Rot', 'b2World']; 
+var mustInclude = ['Ticker', 'ObservablePoint', 'Loader', 'BaseFactory', 'Animation', 'b2Rot', 'b2World', 'GUISprite']; 
 
 var reserved = []; //property names that must not be changed during the minifying process;
 var filtered = ['name', 'set'];
