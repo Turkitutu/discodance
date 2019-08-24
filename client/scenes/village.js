@@ -22,14 +22,15 @@ class Village extends Scene {
         });
         this.connection.packet(incoming, village.id, village.on_player_list, packet => {
             // This is the player list of village received from the server
-            const id = packet.readUInt();
+            const id = packet.readUInt(),
+                  nickname = packet.readString();
             this.player = new Player([0, 0]);
-            this.addPlayer(id, this.player);
+            this.addPlayer(id, nickname, this.player);
             this.camera.focus([this.player]);
             this.camera.zoom(0.1);
 
             while (packet.bytesAvailable > 0) {
-                this.addPlayer(packet.readUInt(), new Player([0, 0]));
+                this.addPlayer(packet.readUInt(), packet.readString(), new Player([0, 0]));
             }
 
             this.loaded = true;
@@ -37,8 +38,8 @@ class Village extends Scene {
         this.connection.packet(incoming, village.id, village.on_new_player, packet => {
             // When a new player joins the village
             const id = packet.readUInt(),
-                  player = new Player([0, 0]);
-            this.addPlayer(id, player);
+                  nickname = packet.readString();
+            this.addPlayer(id, nickname, new Player([0, 0]));
             this.player.prevData = null;
         });
         this.connection.packet(incoming, village.id, village.on_player_left, packet => {
@@ -98,7 +99,8 @@ class Village extends Scene {
         }
         super.disable();
     }
-    addPlayer(id, player) {
+    addPlayer(id, nickname, player) {
+        player.nickname = nickname;
         this.addObject(player);
         this.playerList[id] = player;
         if (this.index === null) {

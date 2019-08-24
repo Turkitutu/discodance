@@ -11,8 +11,15 @@ module.exports = {
             id : 1,
             handshake : 1,
         },
-        village : {
+        login : {
             id : 2,
+            on_error : 0,
+            on_success : 1,
+
+            send_request : 0,
+        },
+        village : {
+            id : 3,
             on_player_list : 0,
             on_new_player : 1,
             on_player_left : 2,
