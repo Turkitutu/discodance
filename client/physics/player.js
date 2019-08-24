@@ -14,7 +14,7 @@ module.exports = class Player extends PhysicObject {
     constructor(position/*, skin/clothes(?)*/) {
         const width = 0.2,
               height = 0.5,
-              scale = 0.3;
+              scale = 0.2;
         super({
             shape: new box2d.b2PolygonShape().SetAsBox(width, height),
             type: box2d.b2BodyType.b2_dynamicBody,
@@ -24,7 +24,7 @@ module.exports = class Player extends PhysicObject {
             density: 3,
             restitution: 0,
             sprite: {
-                object: dragonBones.PixiFactory.factory.buildArmatureDisplay('body', 'character'),
+                object: dragonBones.PixiFactory.factory.buildArmatureDisplay('Armature', 'discodancer'),
                 anchor: [0, 0.5],
                 scale: [scale, scale]
             },
@@ -99,7 +99,7 @@ module.exports = class Player extends PhysicObject {
             const vel = this.body.GetLinearVelocity(),
                   pos = this.body.GetPosition();
             if (this.nextDirection!==this.direction) {
-                this.sprite.$scale.$x = -this.nextDirection*this.scale;
+                this.sprite.$scale.$x = this.nextDirection*this.scale;
                 vel.x = 0;
                 this.body.SetLinearVelocity(vel);
                 this.direction = this.nextDirection;

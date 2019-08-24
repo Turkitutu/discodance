@@ -2,13 +2,13 @@ require('../libs/others.ref.js');
 window.box2d = require('../libs/box2d.ref.js')
 window.PIXI = require('../libs/pixi.ref.js');
 window.dragonBones = require('../libs/dragonbones.ref.js');
+window.EZGUI = require('../libs/ezgui.ref.js');
 
 const { 
         SceneManager,
         Camera,
         Keyboard,
-        Connection,
-        SystemUI
+        Connection
     } = require('./core/'),
     World = require('./physics/world.js'),
     keysDefault = require('./utils/keys-default.js');
@@ -25,8 +25,7 @@ var accumulator = 0;
 
 app.width = 2560;
 app.height = 1440;
-SystemUI.app = app;
-Camera.handleResize(app, SystemUI.components);
+Camera.handleResize(app);
 
 window.$onload = () => {
     document.$body.$style.$overflow = 'hidden'

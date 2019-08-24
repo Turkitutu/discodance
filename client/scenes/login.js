@@ -1,6 +1,6 @@
 const Scene = require('../core/scene.js'),
       {incoming, outgoing, cogs:{login}} = require('../utils/enums.js'),
-      SystemUI = require('../core/system-ui.js');
+
 
 module.exports = class Login extends Scene {
     constructor() {
@@ -41,23 +41,35 @@ module.exports = class Login extends Scene {
         });
 
         window.$sendLogin = (username, password) => this.connection.send(login.id, login.send_request, username, password);
-        /*/
-        const popup = [];
-        popup[0] = new SystemUI.Popup({headerTitle: "Login", position: {x: 80, y: 50}, size: {w: 600,  h:200, max: {h: 1000}}});
-        popup[1] = new SystemUI.TextInput({style: {$fontSize: "38px"}, position: {x: 83, y: 25}, size: {w: 500,  h:40, max: {h: 40}}});
-        popup[2] = new SystemUI.TextInput({style: {$fontSize: "38px"}, position: {x: 83, y: 65}, size: {w: 500,  h:40, max: {h: 40}}});
-        for (const n of popup){
-            n.show();
-            this.camera.center(n);
-        }
-        /*/
 
-        var logo = new PIXI.Sprite(resources.$logo_splash.$texture);
+        const logo = new PIXI.Sprite(resources.$logo_splash.$texture);
         logo.$scale.set(2, 2);
         logo.$position.set(-logo.$width/2, -700);
         this.addChild(logo);
 
-        this.input.preventDefault = false;
+
+        const mainScreen = EZGUI.create({
+            $id: 'myWindow',
+            $component: 'Window',
+            $header: { $position: { $x: 0, $y: 0 }, $height: 80, $text: 'Header' },
+            $draggable: true,
+            $position: { $x: 0, $y: 0 },
+            $width: 1000,
+            $height: 500, 
+            $layout: [1, 3],
+            $children: [
+                null,
+                {
+                    $id: 'button1',
+                    $component: 'Button',
+                    $position: 'center',
+                    $text: 'Click Me',
+                    $width: 400,
+                    $height: 160
+                }
+            ]
+        }, 'metalworks');
+        this.addChild(mainScreen);
         this.enable();
     }
 
