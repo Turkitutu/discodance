@@ -15,7 +15,8 @@ class ServerManager {
 		);
 	}
 	async startServer() {
-		//this.database = await MongoClient.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
+		const mongo = await MongoClient.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
+		this.database = mongo.db('discodance');
 		console.log("Database loaded successfully!");
 
 		this.wss = new WebSocket.Server({port: process.env.SERVER_PORT});
@@ -23,11 +24,10 @@ class ServerManager {
 		//const room = new Room([]);
 		this.village = new Room([]);
 		this.village.isVillage = true;
-		this.wss.on("connection", (ws, req) => {
+		this.wss.on("connection", async (ws, req) => {
 			ws.binaryType = 'nodebuffer';
 			const player = new Player(this, ws, req);
-			player.id = this.playerId++;
-			ws.on("message", message => {
+			ws.on("message", async message => {
 				//console.log("Data from "+player.ipAddress+" : "+message); // Just for test
 				const packets = new ByteArray(message);
 				while (packets.bytesAvailable > 0) {
@@ -36,7 +36,7 @@ class ServerManager {
 						  packet = new Packet(player, packets.subbuffer(offset, length)),
 			              cog = this.cogs[packet.cogId];
 			        if (cog) {
-			        	cog[cog.read(packet)](packet);
+			        	await cog[cog.read(packet)](packet);
 			        } else {
 			        	console.log('New cog : ['+packet.cogId+'] '+packet.data);
 			        }
@@ -48,17 +48,26 @@ class ServerManager {
 		       	//which is the same as:
 		       	//Community.get_room_message(packet);
 			});
-			ws.on("close", () => {
+			ws.on("close", async () => {
 				//We will have constant packets, for example:
 				//this.cogs.login.send_disconnected(Packets.disconnectionPacket)
 
 				if (player.room){
-					player.room.playerDisconnected(player);
+					await player.room.playerDisconnected(player);
 				}
+				if (this.players[player.id]) delete this.players[player.id];
 
 			});
 		});
 	}
+
+    checkConnectedAccount(nickname) {
+    	for (const id of Object.keys(this.players)) {
+    		console.log(this.players[id].nickname+"*")
+            if (this.players[id].nickname == nickname) return true;
+    	}
+    	return false;
+    }
 }
 
 module.exports = ServerManager;

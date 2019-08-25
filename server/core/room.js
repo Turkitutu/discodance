@@ -19,10 +19,10 @@ class Room {
         delete this.players[player.id];
     }
 
-    playerDisconnected(player) {
+    async playerDisconnected(player) {
         if (this.isVillage) { 
-            const packet = new Packet(player).setCog(2);
-            player.server.cogs[2].send_player_left(packet)
+            const packet = new Packet(player).setCog(3);
+            await player.server.cogs[3].send_player_left(packet)
             delete this.players[player.id];
         }
     }

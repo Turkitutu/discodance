@@ -1,4 +1,6 @@
 const players = new Set();
+const Packet = require("./packet.js");
+
 
 class Player {
     constructor(server, ws, req) {
@@ -9,12 +11,14 @@ class Player {
         this.lastHeartbeat = 0;
         this.ping = 0;
         this._heartbeat = true;
+        this.id = 0;
         this.x = 0;
         this.y = 0;
         this.vx = 0;
         this.vy = 0;
         this.jumps = 0;
-        this.direction = 1
+        this.direction = 1;
+        this.nickname = "";
         ws.on("pong", () => {
             this._heartbeat = true;
             this.ping = Date.now() - this.lastHeartbeat;
@@ -27,15 +31,36 @@ class Player {
         return !!this.id; //if player has id then he is logged in.
     }
     */
+
+    async sendLoginError(type) {
+        const packet = new Packet(this).setCog(2); 
+        await this.server.cogs[2].send_error(packet, type);
+    }
     
-    async login(name, password) {
-        //use the database to load info about the player    
-        result = await this.database.collection("users").findOne({ name: name, password: name});
-        if (result) {
-            this.data = result;
-        }else {
-            // send login error packet
+    async login(nickname, password) {
+        nickname = this.parseNickname(nickname);
+        if (nickname == '' || password == ''){
+            await this.sendLoginError('invalid');
+            
+        }else if (this.server.checkConnectedAccount(nickname)){
+            await this.sendLoginError('areadyConnected');
+
+        }else{
+            const result = await this.database.collection("users").findOne({ nickname: nickname, password: password});
+            if (!result) {
+                await this.sendLoginError('invalid');
+            }else {
+                this.id = ++this.server.playerId;
+                this.nickname = nickname;
+                this.server.players[this.id] = this;
+                const packet = new Packet(this).setCog(2); 
+                await this.server.cogs[2].send_success(packet);
+            }
         }
+    }
+
+    parseNickname(name) {
+        return name.substr(0, 1).toUpperCase()+name.substr(1).toLowerCase();
     }
     
 }
