@@ -21,5 +21,13 @@ module.exports = {
             send_join : 0,
             send_movement : 1
         }
+    },
+    states: {
+        idle: 1,
+        run: 2,
+        jump: 3,
+        jumpForward: 4,
+        slide: 5,
+        slideForward: 6
     }
 }

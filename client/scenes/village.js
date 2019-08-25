@@ -26,7 +26,7 @@ class Village extends Scene {
             this.player = new Player([0, 0]);
             this.addPlayer(id, this.player);
             this.camera.focus([this.player]);
-            this.camera.zoom(0.4);
+            this.camera.zoom(0.2);
 
             while (packet.bytesAvailable > 0) {
                 this.addPlayer(packet.readUInt(), new Player([0, 0]));
@@ -59,13 +59,13 @@ class Village extends Scene {
         this.scenes.interface.play();
         
         this.camera.target(this);
-
         this.addChild(this.world.debug.renderer);
 
         this.enable();
 
         this.addObject(new PhysicObject({
             shape: new box2d.b2PolygonShape().SetAsBox(20, 0.5),
+            restitution: 0.1,
             x: 0,
             y: 5
         }));
