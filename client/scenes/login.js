@@ -1,5 +1,5 @@
 const Scene = require('../core/scene.js'),
-      {incoming, outgoing, cogs:{login}} = require('../utils/enums.js'),
+      {incoming, outgoing, cogs:{login}} = require('../utils/enums.js');
 
 
 module.exports = class Login extends Scene {
