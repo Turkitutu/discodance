@@ -63,7 +63,6 @@ class ServerManager {
 
     checkConnectedAccount(nickname) {
     	for (const id of Object.keys(this.players)) {
-    		console.log(this.players[id].nickname+"*")
             if (this.players[id].nickname == nickname) return true;
     	}
     	return false;
