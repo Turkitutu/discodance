@@ -1,3 +1,5 @@
+const { states } = require('../utils/enums.js');
+
 function crossObject(obj1, obj2) {
     for (const key in obj1) {
         if (obj2[key]) return key;
@@ -25,8 +27,7 @@ class ContactListener extends box2d.b2ContactListener {
             if (fixtureA.bottom) {
                 bodyA.bottom++;
                 if (bodyA.bottom == 1) {
-                    if (bodyA.sliding) {
-                        bodyA.sliding = false;
+                    if (bodyA.state == states.slide || bodyA.state == states.slideForward) {
                         bodyA.onSlideLeave();
                     }
                     bodyA.onLanding();
@@ -43,8 +44,8 @@ class ContactListener extends box2d.b2ContactListener {
                     }
                 }
             } else {
-                if (!bodyA.sliding && !bodyA.bottom) {
-                    bodyA.sliding = fixtureA.leftWall ? 1 : 2;
+                if (!(bodyA.state == states.slide || bodyA.state == states.slideForward) && !bodyA.bottom) {
+                    bodyA.nextDirection = fixtureA.leftWall ? 1 : -1;
                     bodyA.onSlide();
                 }
             }
@@ -65,11 +66,8 @@ class ContactListener extends box2d.b2ContactListener {
                         this.checkColor(bodyA);
                     }
                 }
-            } else {
-                if (bodyA.sliding) {
-                    bodyA.sliding = 0;
-                    bodyA.onSlideLeave();
-                }
+            } else if (bodyA.state == states.slide || bodyA.state == states.slideForward) {
+                bodyA.onSlideLeave();
             }
         }
     }

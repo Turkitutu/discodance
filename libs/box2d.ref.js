@@ -26,6 +26,7 @@ Box2D.b2Body.prototype.SetLinearVelocity = Box2D.b2Body.prototype.$SetLinearVelo
 Box2D.b2Body.prototype.GetLinearVelocity = Box2D.b2Body.prototype.$GetLinearVelocity;
 Box2D.b2Body.prototype.ApplyLinearImpulse = Box2D.b2Body.prototype.$ApplyLinearImpulse;
 Box2D.b2Body.prototype.ApplyLinearImpulseToCenter = Box2D.b2Body.prototype.$ApplyLinearImpulseToCenter;
+Box2D.b2Body.prototype.SetLinearDamping = Box2D.b2Body.prototype.$SetLinearDamping;
 Box2D.b2Body.prototype.IsAwake = Box2D.b2Body.prototype.$IsAwake;
 Box2D.b2BodyDef = Box2D.$b2BodyDef;
 Box2D.b2Contact = Box2D.$b2Contact;

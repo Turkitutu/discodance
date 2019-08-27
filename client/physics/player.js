@@ -1,19 +1,14 @@
-const PhysicObject = require('./object.js');
+const PhysicObject = require('./object.js'),
+      { states } = require('../utils/enums.js');
 
 const { round } = Math;
 
-const vec2 = new box2d.b2Vec2(),
-      states = {
-        breath: 1,
-        run: 2,
-        jump: 3,
-        jumpForward: 4
-      }
+const vec2 = new box2d.b2Vec2();
 
 module.exports = class Player extends PhysicObject {
     constructor(position/*, skin/clothes(?)*/) {
-        const width = 0.2,
-              height = 0.5,
+        const width = 0.25,
+              height = 0.65,
               scale = 0.2;
         super({
             shape: new box2d.b2PolygonShape().SetAsBox(width, height),
@@ -25,7 +20,7 @@ module.exports = class Player extends PhysicObject {
             restitution: 0,
             sprite: {
                 object: dragonBones.PixiFactory.factory.buildArmatureDisplay('Armature', 'discodancer'),
-                anchor: [0, 0.5],
+                anchor: [0, 0.655],
                 scale: [scale, scale]
             },
             fixedRotation: true
@@ -57,7 +52,6 @@ module.exports = class Player extends PhysicObject {
         this.left = {};
         this.right = {};
         this.bottom = 0;
-        this.sliding = false;
         this.width = width*200;
         this.height = height*200;
         this.scale = scale;
@@ -67,25 +61,31 @@ module.exports = class Player extends PhysicObject {
         this.isPlayer = true;
         this.color = null;
         this.impulse = new box2d.b2Vec2();
-        this.state = states.breath;
+        this.state = states.idle;
         this.jumps = 0;
         this.hasJumped = false;
     }
-    playAnimation(value) {
+    playAnimation(value, once) {
         if (this.sprite.$animation.$lastAnimationName !== value) {
-            this.sprite.$animation.fadeIn(value, 0.05);
+            this.sprite.$animation.fadeIn(value, 0.1, once && 1);
         }
     }
-    forceAnimation(value) {
-        this.sprite.$animation.fadeIn(value, 0.05);
+    forceAnimation(value, once) {
+        this.sprite.$animation.fadeIn(value, 0.1, once && 1);
     }
     animate() {
         if (this.hasJumped) {
             if (this.jumps < 2) {
                 this.jumps++;
-                this.forceAnimation('jump');
+                this.forceAnimation(this.state == states.jump ? 'jump' : 'jump_forward', true);
                 const vel = this.body.GetLinearVelocity();
-                vel.y = -5;
+                vel.y = -6;
+                if (this.state == states.slide || this.state == states.slideForward) {
+                    vel.x = 3*this.nextDirection;
+                    this.state = states.jump;
+                    this.direction = 0;
+                    this.onSlideLeave();
+                }
                 this.body.SetLinearVelocity(vel);
             } else {
                 // report 
@@ -100,30 +100,37 @@ module.exports = class Player extends PhysicObject {
                   pos = this.body.GetPosition();
             if (this.nextDirection!==this.direction) {
                 this.sprite.$scale.$x = this.nextDirection*this.scale;
-                vel.x = 0;
-                this.body.SetLinearVelocity(vel);
+                if (this.direction) {
+                    vel.x = 0;
+                    this.body.SetLinearVelocity(vel);
+                }
                 this.direction = this.nextDirection;
             }
             if (vel.x*this.direction < this.speed) {
                 this.impulse.Set(0.80*this.direction, 0);
                 this.body.ApplyLinearImpulseToCenter(this.impulse);
             }
-        } else if (this.state == states.breath || this.state == states.jump) {
+        } else if (this.state == states.idle || this.state == states.jump) {
+            if (this.state == states.idle) {
+                this.playAnimation('idle');
+            }
             if (this.direction) {
-                if (this.state == states.breath) {
-                    this.playAnimation('breath');
-                }
                 const vel = this.body.GetLinearVelocity();
                 vel.x = 0;
                 this.body.SetLinearVelocity(vel);
                 this.direction = 0;
             }
+        } else if (this.state == states.slide || this.state == states.slideForward) {
+            this.playAnimation(this.isIdle() ? 'slide' : 'slide_forward');
         }
     }
     update() {
         this.animate();
 
         super.update();
+    }
+    isIdle() {
+        return this.state % 2;
     }
     onColorTouch() {
         console.log('new color', this.color);
@@ -133,18 +140,33 @@ module.exports = class Player extends PhysicObject {
     }
     onLanding() {
         this.jumps = 0;
-        if (this.state == states.jumpForward) {
-            this.state = states.run;
-        } else {
-            this.state = states.breath;
+        if (this.state == states.slide || this.state == states.slideForward) {
+            this.onSlideLeave();
+        } else if (this.isIdle()) {
+            this.state = states.idle;
             this.direction = this.nextDirection;
+        } else {
+            this.state = states.run;
         }
     }
     onSlide() {
-        console.log('sliding');
+        const vel = this.body.GetLinearVelocity();
+        vel.x = 0;
+        this.state = states.slide;
+        this.jumps = 0;
+        this.direction = this.nextDirection;
+        this.sprite.$scale.$x = this.nextDirection*this.scale;
+        this.body.SetLinearDamping(2);
+        this.body.SetLinearVelocity(vel);
     }
     onSlideLeave() {
-        console.log('not sliding');
+        if (this.state == states.slide) {
+            this.state = states.idle;
+            this.direction = this.nextDirection;
+        } else if (this.state == states.slideForward) {
+            this.state = states.run;
+        }
+        this.body.SetLinearDamping(0);
     }
     readInput(input) {
         const holdingRight = input.keyDown.right > input.keyDown.left,
@@ -155,24 +177,29 @@ module.exports = class Player extends PhysicObject {
                 if (this.jumps < 2 && !this.sendJumping) {
                     this.hasJumped = true;
                     this.sendJumping = true;
-                    this.state = states.jump;
+                    if (this.state != states.slide && this.state != states.slideForward) {
+                        this.state = states.jump;
+                    }
                 }
             }
             if (holdingLeft || holdingRight) {
                 if (this.state == states.jump) {
+                    this.nextDirection = holdingRight ? 1 : -1;
                     this.state = states.jumpForward;
+                } else if (this.state == states.slide || this.state == states.slideForward) {
+                    this.state = (holdingRight ? 1 : -1) == this.nextDirection ? states.slideForward : states.slide;
                 } else if (this.state != states.jumpForward) {
+                    this.nextDirection = holdingRight ? 1 : -1;
                     this.state = states.run;
                 }
-                this.nextDirection = holdingRight ? 1 : -1;
-            } 
-        } else if (this.state != states.jump) {
-            this.state = this.state == states.jumpForward ? states.jump : states.breath;
+            }
+        } else if (this.state != states.jump && this.state != states.slide && this.state != states.slideForward) {
+            this.state = this.state == states.jumpForward ? states.jump : states.idle;
         }
     }
     hasChanged() {
         return !this.prevData
-        || this.body.IsAwake() && (this.state == states.breath || this.state == states.jump)
+        || this.body.IsAwake() && (this.state == states.idle || this.state == states.jump)
         || this.prevData[0] != this.state 
         || this.prevData[1] != this.sendJumping 
         || this.prevData[2] != this.nextDirection;
