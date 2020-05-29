@@ -64,6 +64,11 @@ module.exports = class Player extends PhysicObject {
         this.state = states.idle;
         this.jumps = 0;
         this.hasJumped = false;
+        this.id = null;
+        this.nickname = '';
+        this.nicknameText = new PIXI.Text("123", {$fontFamily : 'Tahoma', $fontSize: 34, $fill : 0xffffff, $align : 'center'});
+        this.nicknameText.$position.set(0, 0);
+
     }
     playAnimation(value, once) {
         if (this.sprite.$animation.$lastAnimationName !== value) {
@@ -124,9 +129,16 @@ module.exports = class Player extends PhysicObject {
             this.playAnimation(this.isIdle() ? 'slide' : 'slide_forward');
         }
     }
+
+    updateNickname() {
+        const pos = this.body.GetPosition();
+        //this.nicknameText.$position.set(pos.x, pos.y)
+        this.nicknameText.$text = this.nickname;
+    }
+    
     update() {
         this.animate();
-
+        this.updateNickname();
         super.update();
     }
     isIdle() {

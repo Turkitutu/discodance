@@ -22,24 +22,29 @@ class Village extends Scene {
         });
         this.connection.packet(incoming, village.id, village.on_player_list, packet => {
             // This is the player list of village received from the server
-            const id = packet.readUInt(),
-                  nickname = packet.readString();
             this.player = new Player([0, 0]);
-            this.addPlayer(id, nickname, this.player);
+            this.player.id = packet.readUInt();
+            this.player.nickname = packet.readString()[0];
+            this.addPlayer(this.player);
+            window.$player = this.player;
             this.camera.focus([this.player]);
             this.camera.zoom(0.2);
 
             while (packet.bytesAvailable > 0) {
-                this.addPlayer(packet.readUInt(), packet.readString(), new Player([0, 0]));
+                const player = new Player([0, 0]);
+                player.id = packet.readUInt();
+                player.nickname = packet.readString()[0];
+                this.addPlayer(player);
             }
 
             this.loaded = true;
         });
         this.connection.packet(incoming, village.id, village.on_new_player, packet => {
             // When a new player joins the village
-            const id = packet.readUInt(),
-                  nickname = packet.readString();
-            this.addPlayer(id, nickname, new Player([0, 0]));
+            const player = new Player([0, 0]);
+            player.id = packet.readUInt();
+            player.nickname = packet.readString()[0];
+            this.addPlayer(player)
             this.player.prevData = null;
         });
         this.connection.packet(incoming, village.id, village.on_player_left, packet => {
@@ -99,10 +104,10 @@ class Village extends Scene {
         }
         super.disable();
     }
-    addPlayer(id, nickname, player) {
-        player.nickname = nickname;
+    addPlayer(player) {
         this.addObject(player);
-        this.playerList[id] = player;
+        this.addChild(player.nicknameText);
+        this.playerList[player.id] = player;
         if (this.index === null) {
             this.index = this.$children.indexOf(this.player.sprite);
         }
@@ -115,6 +120,7 @@ class Village extends Scene {
         if (obj.sprite) this.addChild(obj.sprite);
     }
     removePlayer(id) {
+        this.removeChild(this.playerList[id].nicknameText);
         this.removeObject(this.playerList[id]);
         delete this.playerList[id];
     }
