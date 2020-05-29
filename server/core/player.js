@@ -46,7 +46,8 @@ class Player {
             await this.sendLoginError('areadyConnected');
 
         }else{
-            const result = await this.database.collection("users").findOne({ nickname: nickname, password: password});
+            //const result = await this.database.collection("users").findOne({ nickname: nickname, password: password});
+            const result = true;
             if (!result) {
                 await this.sendLoginError('invalid');
             }else {

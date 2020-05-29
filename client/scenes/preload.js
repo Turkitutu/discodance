@@ -76,6 +76,7 @@ module.exports = class preload extends Scene {
                 this.addChild(text);
                 EZGUI.Theme.load([resources.$metalworks_theme.$data], () => {
                     this.loaded = true;
+
                 });
             });
         });

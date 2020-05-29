@@ -15,9 +15,9 @@ class ServerManager {
 		);
 	}
 	async startServer() {
-		const mongo = await MongoClient.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
-		this.database = mongo.db('discodance');
-		console.log("Database loaded successfully!");
+		//const mongo = await MongoClient.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
+		//this.database = mongo.db('discodance');
+		//console.log("Database loaded successfully!");
 
 		this.wss = new WebSocket.Server({port: process.env.SERVER_PORT});
 		console.log("Success!");
