@@ -6,8 +6,11 @@ This project has been **paused** for several years and remains **incomplete**. W
 
 ### Tech Stack
 **Frontend:** Pixi.js for rendering 2D graphics and animations.
+
 **Backend:** Node.js for handling server-side logic and multiplayer functionality.
+
 **WebSockets:** Real-time communication using row WebSocket (ByteArray).
+
 **Express:** Web server for hosting the game client.
 
 ### Team
