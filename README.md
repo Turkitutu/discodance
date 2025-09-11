@@ -15,7 +15,7 @@ This project has been **paused** for several years and remains **incomplete**. W
 
 ### Team :
 ##### This project was developed by a dedicated team, with the following individuals as key members:
-- [Heni Yangui](https://github.com/your-github/hunyan-io)
+- [Heni Yangui](https://github.com/hunyan-io)
 - [Haithem Turki](https://github.com/turkitutu)
 - [Omaraldin](https://github.com/Omaraldin)
 - [Massito](https://github.com/unlocker001)
